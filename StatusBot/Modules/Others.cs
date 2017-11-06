@@ -35,16 +35,17 @@ namespace StatusBot.Modules
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot's stats")
+                .WithTitle("StatusBot v1.0.2")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
                 .AddInlineField("Creator", "StahlFerro#0055")
                 .AddInlineField($"Creation date ({(DateTime.Now - cdate).Days}d old)", $"{cdate}")
-                .AddInlineField("Library", "Discord.NET")
-                .AddInlineField("Library Version", $"v{DiscordSocketConfig.Version}")
+                .AddInlineField("Library", $"<:dotnet:315951014156959744> Discord.NET v{ DiscordSocketConfig.Version}")
                 .AddInlineField("Bot ID", 332603467577425929)
                 .AddInlineField("Latency", client.Latency + "ms")
-                //.AddInlineField("Links", $"[Bot invite](https://discordapp.com/oauth2/authorize?client_id=332603467577425929&scope=bot&permissions=117760)")
+                .AddInlineField("Links",
+                $"[Development server](https://discord.gg/GRBeCAX)\n" +
+                $"[Github](https://github.com/StahlFerro/StatusBot)")
                 ;
             await Context.Channel.SendMessageAsync("", embed: E);
         }
