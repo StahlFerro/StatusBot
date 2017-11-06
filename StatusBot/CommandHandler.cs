@@ -24,9 +24,7 @@ namespace StatusBot
         void SWatchStop()
         {
             T.Stop();
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds");
-            Console.ResetColor();
         }
 
         public CommandHandler(IServiceProvider provider)
@@ -46,7 +44,8 @@ namespace StatusBot
         {
             SWatchStart();
             var message = parameterMessage as SocketUserMessage;
-
+            var ch = parameterMessage.Channel as IGuildChannel;
+            var G = ch.Guild as IGuild;
             //Prevent commands triggered by itself or other bots
             if (message == null || message.Author.IsBot) return;
             int argPos = 0;
@@ -57,15 +56,18 @@ namespace StatusBot
             //Command success/fail notice message
             if (result.IsSuccess)
             {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                SWatchStop();
+                Console.ResetColor();
             }
             else
             {
-                await message.Channel.SendMessageAsync(result.ToString());
+                if (result.Error.Value != CommandError.UnknownCommand)
+                    await message.Channel.SendMessageAsync(result.ErrorReason);
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"{result.ToString()}");
                 Console.ResetColor();
             }
-            SWatchStop();
         }
     }
 }

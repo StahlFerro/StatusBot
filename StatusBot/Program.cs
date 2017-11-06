@@ -46,12 +46,24 @@ namespace StatusBot
             handler = new CommandHandler(serviceprovider);
             await handler.ConfigureAsync();
 
+            client.MessageReceived += MessageReceived;
             client.Connected += AutoSetGame;
             client.GuildMemberUpdated += RS.AutoPM;
             client.JoinedGuild += RS.CreateNewRegistry;
 
             // Block this program until it is closed.
             await Task.Delay(-1);
+        }
+
+        private async Task MessageReceived(SocketMessage msg)
+        {
+            if (msg.Content.StartsWith("s]") || msg.Author.Id == 300611567874080769)
+            {
+                var ch = msg.Channel as IGuildChannel;
+                var G = ch.Guild as IGuild;
+                Console.WriteLine($"{msg.CreatedAt.LocalDateTime.ToLongTimeString()} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}");
+            }
+            await Task.CompletedTask;
         }
 
         private Task Log(LogMessage msg) //For built-in Discord.Net logging feature
