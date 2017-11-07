@@ -97,7 +97,8 @@ namespace StatusBot.Services.ReminderService
                     var ch = await receiver.GetOrCreateDMChannelAsync();
                     await ch.SendMessageAsync($"{R} is offline");
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{DateTime.Now} Successfully PM'd {receiver} that {R} is offline");
+                    Console.WriteLine($"{DateTime.Now.ToLocalTime()} Successfully PM'd {receiver} that {R} is offline");
+                    File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Successfully PM'd {receiver} that {R} is offline\n");
                     Console.ResetColor();
                 }
             }

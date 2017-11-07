@@ -28,7 +28,8 @@ namespace StatusBot
 
         public async Task Start()
         {
-            Console.WriteLine($"{DateTime.Now.ToLocalTime().ToLongTimeString()} Starting StatusBot");
+            Console.WriteLine($"{DateTime.Now.ToLocalTime()} Starting StatusBot");
+            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
             client = new DiscordSocketClient(new DiscordSocketConfig {
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true
@@ -41,7 +42,8 @@ namespace StatusBot
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
             time.Stop();
-            Console.WriteLine($"{DateTime.Now.ToLocalTime().ToLongTimeString()} Connected in " + time.Elapsed.TotalSeconds.ToString("F3") + " seconds");
+            Console.WriteLine($"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds");
+            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
 
             handler = new CommandHandler(serviceprovider);
             await handler.ConfigureAsync();
@@ -57,16 +59,18 @@ namespace StatusBot
 
         private async Task MessageReceived(SocketMessage msg)
         {
-            if (msg.Content.StartsWith("s]") || msg.Author.Id == 300611567874080769)
+            //Outputs to console and logs to logfile if the message starts with the s] prefix or is from StatusBot itself
+            if (msg.Content.StartsWith("s]") || msg.Author.Id == 332603467577425929)
             {
                 var ch = msg.Channel as IGuildChannel;
                 var G = ch.Guild as IGuild;
-                Console.WriteLine($"{msg.CreatedAt.LocalDateTime.ToLongTimeString()} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}");
+                Console.WriteLine($"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}");
+                File.AppendAllText("logfile.txt", $"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}\n");
             }
             await Task.CompletedTask;
         }
 
-        private Task Log(LogMessage msg) //For built-in Discord.Net logging feature
+        private Task Log(LogMessage msg) //For built-in Discord.Net logging feature that logs to console and logfile
         {
             var cc = Console.ForegroundColor;
             switch (msg.Severity)
@@ -82,7 +86,8 @@ namespace StatusBot
                 case LogSeverity.Debug:
                     cc = ConsoleColor.DarkGray; break;
             }
-            Console.WriteLine(msg.ToString());
+            Console.WriteLine($"{DateTime.Now.ToShortDateString()} {msg.ToString()}");
+            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToShortDateString()} {msg.ToString()}\n");
             return Task.CompletedTask;
         }
 

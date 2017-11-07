@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Diagnostics;
+using System.IO;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -25,6 +26,7 @@ namespace StatusBot
         {
             T.Stop();
             Console.WriteLine($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds");
+            File.AppendAllText("logfile.txt", $"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
         }
 
         public CommandHandler(IServiceProvider provider)
@@ -62,11 +64,13 @@ namespace StatusBot
             }
             else
             {
+                //Prevents unknown command exception to be posted as the error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ErrorReason);
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"{result.ToString()}");
                 Console.ResetColor();
+                File.AppendAllText("logfile.txt", $"{result.ToString()}\n");
             }
         }
     }

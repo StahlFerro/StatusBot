@@ -6,6 +6,8 @@
 # Custom exceptions for StatusBot
 *.json
 *.bat
+*.txt
+
 
 # User-specific files
 *.suo
