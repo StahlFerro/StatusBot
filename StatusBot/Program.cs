@@ -102,7 +102,7 @@ namespace StatusBot
 
         private async Task AutoSetGame()
         {
-            await client.SetGameAsync("type s]help");
+            await client.SetGameAsync("type s]h");
         }
     }
 }

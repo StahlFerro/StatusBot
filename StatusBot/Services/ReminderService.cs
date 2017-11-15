@@ -23,7 +23,7 @@ namespace StatusBot.Services.ReminderService
 
     public class ReminderService
     {
-        public string bookfilepath = @"C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\StatusBot\StatusBot\reminderbook.json";
+        public string bookfilepath = "reminderbook.json";
 
         public async Task CreateNewRegistry(SocketGuild G)
         {

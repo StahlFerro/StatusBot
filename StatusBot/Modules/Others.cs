@@ -7,6 +7,7 @@ using System.IO;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using StatusBot.Services.ReminderService;
 
 namespace StatusBot.Modules
 {
@@ -35,7 +36,7 @@ namespace StatusBot.Modules
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot v1.0.3")
+                .WithTitle("StatusBot v1.0.4")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
                 .AddInlineField("Creator", "StahlFerro#0055")
