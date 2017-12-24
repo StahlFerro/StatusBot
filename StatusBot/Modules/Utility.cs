@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
-using System.IO;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using StatusBot.Services.ReminderService;
+
 
 namespace StatusBot.Modules
 {
-    public class Others : ModuleBase
+    public class Utility : ModuleBase
     {
         public Discord.Color color = new Discord.Color(0, 138, 168);
 
@@ -36,7 +35,7 @@ namespace StatusBot.Modules
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot v1.0.4")
+                .WithTitle("StatusBot v2.0.0")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
                 .AddInlineField("Creator", "StahlFerro#0055")
@@ -70,44 +69,6 @@ namespace StatusBot.Modules
                 "bot got rekt__\n\n" +
 
                 "So that's all I can explain. Any further questions, please ask my creator.");
-        }
-
-        [Command("reboot")]
-        [Summary("Restarts StatusBot. Creator only")]
-        [RequireContext(ContextType.Guild)]
-        [RequireOwner]
-        public async Task Restart()
-        {
-            var E = new EmbedBuilder()
-                .WithColor(new Color(200, 200, 200))
-                .WithDescription("Restarting...");
-            await Context.Channel.SendMessageAsync("", embed: E);
-            Environment.Exit(1);
-        }
-
-        [Command("end")]
-        [Summary("Shuts down StatusBot. Creator only")]
-        [RequireContext(ContextType.Guild)]
-        [RequireOwner]
-        public async Task ShutDown()
-        {
-            var E = new EmbedBuilder()
-                .WithColor(new Color(200, 200, 200))
-                .WithDescription("Shutting down...");
-            await Context.Channel.SendMessageAsync("", embed: E);
-            Environment.Exit(0);
-        }
-
-        [Command("setgame")]
-        [Summary("Sets the game of StatusBot. Creator only")]
-        [RequireContext(ContextType.Guild)]
-        [RequireOwner]
-        public async Task SetGame([Remainder] string game = null)
-        {
-            var client = Context.Client as DiscordSocketClient;
-            await client.SetGameAsync(game, streamType: StreamType.NotStreaming);
-            if (game == null) await Context.Channel.SendMessageAsync("Successfully reset current game");
-            else await Context.Channel.SendMessageAsync($"Successfully set game to {game}");
         }
     }
 }

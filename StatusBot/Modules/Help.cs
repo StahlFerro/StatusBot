@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace StatusBot.Modules.HelpModule
+namespace StatusBot.Modules
 {
     public class Help : ModuleBase
     {
@@ -33,7 +33,7 @@ namespace StatusBot.Modules.HelpModule
                 var modules = C.Modules.OrderBy(x => x.Name);
                 foreach (var module in modules)
                 {
-                    if (module.Name == "Help") { continue; }
+                    if (module.Name == "Help" || module.Name == "BotOwner") { continue; }
                     string description = null;
                     var commands = module.Commands.OrderBy(x => x.Name);
                     foreach (var c in commands)
@@ -73,5 +73,6 @@ namespace StatusBot.Modules.HelpModule
                 await ReplyAsync("", false, E.Build());
             }
         }
+
     }
 }

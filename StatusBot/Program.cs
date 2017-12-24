@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord.Rest;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using StatusBot.Services.ReminderService;
+using StatusBot.Services;
 
 namespace StatusBot
 {
@@ -20,7 +15,7 @@ namespace StatusBot
         static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
         public static DiscordSocketClient client;
         private CommandHandler handler;
-        private ReminderService RS = new ReminderService();
+        public DataAccess DA;
 
         static Program()
         {
@@ -28,16 +23,17 @@ namespace StatusBot
 
         public async Task Start()
         {
+            DA = new DataAccess();
             Console.WriteLine($"{DateTime.Now.ToLocalTime()} Starting StatusBot");
             File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
-            client = new DiscordSocketClient(new DiscordSocketConfig {
+            client = new DiscordSocketClient(new DiscordSocketConfig
+            {
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true
             });
             client.Log += Log;
             var serviceprovider = ConfigureServices();
-            string tokenson = File.ReadAllText("token.json");
-            string token = JsonConvert.DeserializeObject<string>(tokenson);
+            string token = File.ReadAllText("token.txt");
             var time = Stopwatch.StartNew();
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
@@ -50,8 +46,7 @@ namespace StatusBot
 
             client.MessageReceived += MessageReceived;
             client.Connected += AutoSetGame;
-            client.GuildMemberUpdated += RS.AutoPM;
-            client.JoinedGuild += RS.CreateNewRegistry;
+            client.GuildMemberUpdated += DA.AutoPM;
 
             // Block this program until it is closed.
             await Task.Delay(-1);

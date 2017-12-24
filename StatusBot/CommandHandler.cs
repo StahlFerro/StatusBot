@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Reflection;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
+using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -66,7 +65,7 @@ namespace StatusBot
             {
                 //Prevents unknown command exception to be posted as the error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
-                    await message.Channel.SendMessageAsync(result.ErrorReason);
+                    await message.Channel.SendMessageAsync(result.ToString());
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"{result.ToString()}");
                 Console.ResetColor();
