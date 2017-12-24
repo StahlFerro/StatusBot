@@ -28,7 +28,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.REMINDERCONFIGs.ToList();
+                return SC.REMINDERCONFIGs.Where(rc => rc.GuildID == Convert.ToInt64(G.Id)).ToList();
             }
         }
 
