@@ -36,11 +36,11 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return GetListeners(G, Bot).FirstOrDefault(l => l.UserID == Convert.ToInt64(Listener.Id));
+                return GetListenerList(G, Bot).FirstOrDefault(l => l.UserID == Convert.ToInt64(Listener.Id));
             }
         }
 
-        public List<LISTENER> GetListeners(SocketGuild G, SocketGuildUser Bot)
+        public List<LISTENER> GetListenerList(SocketGuild G, SocketGuildUser Bot)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
@@ -50,7 +50,7 @@ namespace StatusBot.Services
             }
         }
 
-        public List<LISTENER> GetListeners(REMINDERCONFIG RC)
+        public List<LISTENER> GetListenerList(REMINDERCONFIG RC)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
@@ -114,26 +114,6 @@ namespace StatusBot.Services
                 var L = GetListener(G, Bot, Listener);
                 SC.Remove(L);
                 await SC.SaveChangesAsync();
-            }
-        }
-
-        public async Task AutoPM(SocketGuildUser before, SocketGuildUser after)
-        {
-            var G = before.Guild;
-            var reminder = GetReminderConfig(G, before);
-            if (before.IsBot && reminder.Active && after.Status == UserStatus.Offline)
-            {
-                foreach (var listener in GetListeners(G, before))
-                {
-                    var U = Program.client.GetUser(Convert.ToUInt64(listener.UserID));
-                    var dmch = await U.GetOrCreateDMChannelAsync();
-                    await dmch.SendMessageAsync($"{after} is offline");
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline");
-                    File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline\n");
-                    Console.ResetColor();
-
-                }
             }
         }
     }

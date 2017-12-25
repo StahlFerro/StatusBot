@@ -35,7 +35,7 @@ namespace StatusBot.Modules
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot v2.0.0")
+                .WithTitle("StatusBot v2.1.0")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
                 .AddInlineField("Creator", "StahlFerro#0055")
@@ -51,19 +51,19 @@ namespace StatusBot.Modules
         }
 
         [Command("how")]
-        [Summary("Explains how to use my config and how I work")]
+        [Summary("Explains how to use my reminders and how I work")]
         [RequireContext(ContextType.Guild)]
         public async Task HowDoIWork()
         {
             await ReplyAsync(
-                "Well, it's pretty simple. Each server has only one reminder config. The config consists of these 3 " +
-                "variables: `Active`, `Target` and `Receiver`\n" +
+                "Well, it's pretty simple. Each server can have one or more reminders. A reminder consists of these 3 " +
+                "variables: `Active`, `Bot` and `Listeners`\n" +
                 "**Active** : If true, then the reminder is set active. If disabled, then it's disabled duh\n" +
-                "**Target** : The bot that will be ~~stalked~~ monitored by me\n" +
-                "**Receiver** : One or more users that will be DM'd by me if the Target bot goes offline\n\n" +
+                "**Bot** : The bot that will be ~~stalked~~ monitored by me\n" +
+                "**Listeners** : One or more users that will be DM'd by me if the Bot goes offline\n\n" +
 
                 "So here's an example, when you set the following config on a server where " +
-                "Active is set as `true`, Bot X is set as `Target`, You as `Receiver`, " +
+                "Active is set as `true`, SomeBot is set as `Bot`, You as `Listener`, " +
                 "I will DM you if the poor little has it's status set as offline aka dies. __The bot MUST be " +
                 "in the same server where you set up this config or else I won't be able tell you that your precious " +
                 "bot got rekt__\n\n" +

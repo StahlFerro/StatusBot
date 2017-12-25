@@ -17,141 +17,146 @@ namespace StatusBot.Modules
         DataAccess DA = new DataAccess();
 
         [Command("rmd")]
-        [Summary("Displays guild reminders")]
+        [Summary("Displays guild bot reminders")]
         [RequireContext(ContextType.Guild)]
         public async Task Reminders([Remainder] SocketGuildUser Bot = null)
         {
-            try
+            var client = Context.Client as DiscordSocketClient;
+            var G = Context.Guild as SocketGuild;
+            string desc = "";
+            var E = new EmbedBuilder().WithColor(color);
+            if (Bot == null)
             {
-                var client = Context.Client as DiscordSocketClient;
-                var G = Context.Guild as SocketGuild;
-                string desc = "";
-                var E = new EmbedBuilder().WithColor(color);
-                if (Bot == null)
+                List<REMINDERCONFIG> guildreminders = DA.GetGuildReminders(G);
+                foreach (var rc in guildreminders)
                 {
-                    List<REMINDERCONFIG> guildreminders = DA.GetGuildReminders(G);
-                    foreach (var rc in guildreminders)
-                    {
-                        List<LISTENER> listeners = DA.GetListeners(rc);
-                        string rcstatus;
-                        if (rc.Active) rcstatus = "Active";
-                        else rcstatus = "Inactive";
-                        desc += $"{G.GetUser(Convert.ToUInt64(rc.BotID))} ({rc.BotID}) | {rcstatus} | {listeners.Count} listener\n";
-                    }
-                    if (String.IsNullOrWhiteSpace(desc)) desc = "No reminders yet. Cri";
-                    E.WithTitle($"{G.Name} reminders").WithDescription(desc);
-                }
-                else
-                {
-                    REMINDERCONFIG reminder = DA.GetReminderConfig(G, Bot);
-                    if (reminder == null) { await ReplyAsync("Reminder not found"); return; }
-                    foreach (var listener in DA.GetListeners(G, Bot))
-                    {
-                        desc += $"{G.GetUser(Convert.ToUInt64(listener.UserID))} ({listener.UserID})\n";
-                    }
+                    List<LISTENER> listenerlist = DA.GetListenerList(rc);
                     string rcstatus;
-                    if (reminder.Active) rcstatus = "Active";
+                    if (rc.Active) rcstatus = "Active";
                     else rcstatus = "Inactive";
-                    E.WithTitle($"Listeners of {Bot} ({Bot.Id}) | {rcstatus}").WithDescription(desc);
+                    desc += $"{G.GetUser(Convert.ToUInt64(rc.BotID))} ({rc.BotID}) | {rcstatus} | {listenerlist.Count} listener(s)\n";
                 }
-                await ReplyAsync("", embed: E);
+                if (String.IsNullOrWhiteSpace(desc)) desc = "No bot reminders yet. Cri";
+                E.WithTitle($"{G.Name} reminders").WithDescription(desc);
             }
-            catch (Exception e)
+            else
             {
-                await ReplyAsync(e.Message + "\n" + e.StackTrace);
+                REMINDERCONFIG reminder = DA.GetReminderConfig(G, Bot);
+                if (reminder == null) { await ReplyAsync("⛔ Reminder not found"); return; }
+                foreach (var listener in DA.GetListenerList(G, Bot))
+                {
+                    desc += $"{G.GetUser(Convert.ToUInt64(listener.UserID))} ({listener.UserID})\n";
+                }
+                if (String.IsNullOrWhiteSpace(desc)) desc = "No listeners for this reminder yet. Cri";
+                string rcstatus;
+                if (reminder.Active) rcstatus = "Active";
+                else rcstatus = "Inactive";
+                E.WithTitle($"Listeners of {Bot} ({Bot.Id}) | {rcstatus}").WithDescription(desc);
             }
+            await ReplyAsync("", embed: E);
         }
 
         [Command("addrmd")]
-        [Summary("Adds a new reminder to the list, or if already exists, modifies it's active status")]
+        [Summary("Adds a new bot reminder to the list\nExamples:\n" +
+            "`s]addrmd MyBot` adds a bot to be tracked for it's offline status, reminder deactivated by default\n" +
+            "`s]modrmd MyBot true` adds as well as activating the reminder")]
         [RequireContext(ContextType.Guild)]
-        public async Task AddRmd(SocketGuildUser Bot, [Remainder] bool x = false)
+        public async Task AddRmd(SocketGuildUser bot, [Remainder] bool x = false)
         {
-            if (!Bot.IsBot) { await ReplyAsync("Reminder must be a bot!"); return; }
+            if (!bot.IsBot) { await ReplyAsync("⛔ Reminder must be a bot!"); return; }
             string status = "";
             if (x) status = "Activated";
             else status = "Deactivated";
             var G = Context.Guild as SocketGuild;
-            if (DA.GetReminderConfig(G, Bot) == null) //If the reminder doesn't exist
+            if (DA.GetReminderConfig(G, bot) == null) //If the reminder doesn't exist
             {
-                await DA.AddReminder(G, Bot, x);
-                await ReplyAsync($"Added new reminder: {Bot} ({Bot.Id}) and {status}");
+                await DA.AddReminder(G, bot, x);
+                await ReplyAsync($"✅ Added new bot reminder: {bot} ({bot.Id}) and {status}");
             }
             else
             {
-                await DA.ModifyReminderStatus(G, Bot, x);
-                await ReplyAsync($"{status} reminder: {Bot} ({Bot.Id})");
+                await ReplyAsync("⛔ A reminder with the same target bot already exists on the list!");
             }
         }
 
         [Command("modrmd")]
-        [Summary("Modifies a reminder's active status")]
+        [Summary("Activates or deactivates a bot reminder.\nExamples:\n" +
+            "`s]modrmd MyBot false` deactivates the reminder\n" +
+            "`s]modrmd MyBot true` activates the reminder")]
         [RequireContext(ContextType.Guild)]
-        public async Task ModRmd(SocketGuildUser Bot, [Remainder] bool x = false)
+        public async Task ModRmd(SocketGuildUser bot, [Remainder] bool x = false)
         {
             string status = "";
             if (x) status = "Activated";
             else status = "Deactivated";
             var G = Context.Guild as SocketGuild;
-            if (DA.GetReminderConfig(G, Bot) == null) //If the reminder doesn't exist
+            if (DA.GetReminderConfig(G, bot) == null) //If the reminder doesn't exist
             {
-                await ReplyAsync("⛔ The reminder to be modified is not on the list!");
+                await ReplyAsync("⛔ The bot reminder to be modified is not on the list!");
             }
             else
             {
-                await DA.ModifyReminderStatus(G, Bot, x);
-                await ReplyAsync($"{status} reminder: {Bot} ({Bot.Id})");
+                await DA.ModifyReminderStatus(G, bot, x);
+                await ReplyAsync($"✅ {status} reminder: {bot} ({bot.Id})");
             }
         }
 
         [Command("delrmd")]
-        [Summary("Removes a reminder from the list")]
+        [Summary("Removes a bot reminder from the list\nExample:" +
+            "`s]delrmd MyBot`")]
         [RequireContext(ContextType.Guild)]
-        public async Task DelRmd([Remainder] SocketGuildUser Bot)
+        public async Task DelRmd([Remainder] SocketGuildUser bot)
         {
             var G = Context.Guild as SocketGuild;
-            if (DA.GetReminderConfig(G, Bot) == null)
+            if (DA.GetReminderConfig(G, bot) == null)
             {
-                await ReplyAsync("⛔ The reminder to be deleted is not on the list!");
+                await ReplyAsync("⛔ The bot reminder to be deleted is not on the list!");
             }
             else
             {
-                await DA.DelReminder(G, Bot);
-                await ReplyAsync($"Deleted new bot: {Bot} ({Bot.Id})");
+                await DA.DelReminder(G, bot);
+                await ReplyAsync($"✅ Deleted new bot reminder: {bot} ({bot.Id})");
             }
         }
 
         [Command("addlist")]
-        [Summary("Adds a new listener to a reminder")]
+        [Summary("Adds a new listener to a reminder\nExamples:\n" +
+            "`s]addlist MyBot` assigns yourself to be reminded of MyBot going offline\n" +
+            "`s]addlist MyBot Han` assigns another user to be reminded of MyBot going offline")]
         [RequireContext(ContextType.Guild)]
-        public async Task AddList(SocketGuildUser Bot, [Remainder] SocketGuildUser Listener)
+        public async Task AddList(SocketGuildUser bot, [Remainder] SocketGuildUser listener = null)
         {
+            if (listener.IsBot) { await ReplyAsync("⛔ The listener must be a user, not a bot!"); return; }
+            listener = listener ?? Context.User as SocketGuildUser;
             var G = Context.Guild as SocketGuild;
-            if (DA.GetListener(G, Bot, Listener) == null)
+            if (DA.GetListener(G, bot, listener) == null)
             {
-                await DA.AddListener(G, Bot, Listener);
-                await ReplyAsync($"Added new listener to {Bot}: {Listener} {Listener.Id}");
+                await DA.AddListener(G, bot, listener);
+                await ReplyAsync($"✅ Added new listener to {bot}: {listener} ({listener.Id})");
             }
             else
             {
-                await ReplyAsync($"⛔ same listener already exists for this reminder");
+                await ReplyAsync($"⛔ The listener already exists for this bot reminder");
             }
         }
 
         [Command("dellist")]
-        [Summary("Deletes a listener from a reminder")]
+        [Summary("Deletes a listener from a reminder\nExamples:\n" +
+            "`s]dellist MyBot` removes yourself from the MyBot reminder\n" +
+            "`s]dellist MyBot Solo` removes another user from the MyBot reminder")]
         [RequireContext(ContextType.Guild)]
-        public async Task DelList(SocketGuildUser Bot, [Remainder] SocketGuildUser Listener)
+        public async Task DelList(SocketGuildUser bot, [Remainder] SocketGuildUser listener = null)
         {
+            listener = listener ?? Context.User as SocketGuildUser;
             var G = Context.Guild as SocketGuild;
-            if (DA.GetListener(G, Bot, Listener) == null)
+            if (DA.GetListener(G, bot, listener) == null)
             {
-                await ReplyAsync($"⛔ the listener does not exist for this reminder");
+                await ReplyAsync($"⛔ The listener does not exist for this bot reminder");
             }
             else
             {
-                await DA.DelListener(G, Bot, Listener);
-                await ReplyAsync($"Deleted listener from {Bot}: {Listener} {Listener.Id}");
+                await DA.DelListener(G, bot, listener);
+                await ReplyAsync($"✅ Deleted listener from {bot}: {listener} ({listener.Id})");
             }
         }
     }
