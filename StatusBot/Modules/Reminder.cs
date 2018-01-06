@@ -61,6 +61,8 @@ namespace StatusBot.Modules
             "`s]addrmd MyBot` adds a bot to be tracked for it's offline status, reminder deactivated by default\n" +
             "`s]modrmd MyBot true` adds as well as activating the reminder")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task AddRmd(SocketGuildUser bot, [Remainder] bool x = false)
         {
             if (!bot.IsBot) { await ReplyAsync("⛔ Reminder must be a bot!"); return; }
@@ -84,6 +86,8 @@ namespace StatusBot.Modules
             "`s]modrmd MyBot false` deactivates the reminder\n" +
             "`s]modrmd MyBot true` activates the reminder")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task ModRmd(SocketGuildUser bot, [Remainder] bool x = false)
         {
             string status = "";
@@ -105,6 +109,8 @@ namespace StatusBot.Modules
         [Summary("Removes a bot reminder from the list\nExample:" +
             "`s]delrmd MyBot`")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task DelRmd([Remainder] SocketGuildUser bot)
         {
             var G = Context.Guild as SocketGuild;
@@ -124,6 +130,8 @@ namespace StatusBot.Modules
             "`s]addlist MyBot` assigns yourself to be reminded of MyBot going offline\n" +
             "`s]addlist MyBot Han` assigns another user to be reminded of MyBot going offline")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task AddList(SocketGuildUser bot, [Remainder] SocketGuildUser listener = null)
         {
             if (listener.IsBot) { await ReplyAsync("⛔ The listener must be a user, not a bot!"); return; }
@@ -145,6 +153,8 @@ namespace StatusBot.Modules
             "`s]dellist MyBot` removes yourself from the MyBot reminder\n" +
             "`s]dellist MyBot Solo` removes another user from the MyBot reminder")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task DelList(SocketGuildUser bot, [Remainder] SocketGuildUser listener = null)
         {
             listener = listener ?? Context.User as SocketGuildUser;
