@@ -13,7 +13,8 @@ namespace StatusBot.Services
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=user\sqlexpress;Database=StatusBot;Trusted_Connection=True;MultipleActiveResultSets=true");
+            //optionsBuilder.UseSqlServer(@"Server=user\sqlexpress;Database=StatusBot;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlite("Data Source=./Services/StatusBot.db");
         }
     }
 }
