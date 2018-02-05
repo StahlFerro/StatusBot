@@ -6,7 +6,7 @@ So far this bot is only used for testing and to assist on special cases only. It
 
 For anyone trying to run their own local instance or self-hosting StatusBot by cloning this repo, it requires either:
 1. An MS SQL Server database which is not included, but can be generated using [EF Core's PMC Tools](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/powershell) on Visual Studio.
-2. An SQLite Server database which should be named StatusBot.db in the Services file.
+2. An SQLite Server database which should be named StatusBot.db in the Services folder.
 
 Each of these database choices require the statements inside the OnConfiguring method on the [StatusBotContext.cs](https://github.com/StahlFerro/StatusBot/blob/master/StatusBot/Services/StatusBotContext.cs) file changed to the database provider of your choice.
 
