@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord.Net;
 
 
-namespace StatusBot.Modules
+namespace StatusBot.Modules.Utility
 {
     public class Utility : ModuleBase
     {
@@ -35,7 +36,7 @@ namespace StatusBot.Modules
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot v2.1.0")
+                .WithTitle("StatusBot v2.1.3")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
                 .AddInlineField("Creator", "StahlFerro#0055")
@@ -48,6 +49,18 @@ namespace StatusBot.Modules
                 $"[Github](https://github.com/StahlFerro/StatusBot)")
                 ;
             await Context.Channel.SendMessageAsync("", embed: E);
+        }
+
+        [Command("changelog")]
+        [Summary("Displays the latest changelog of the bot")]
+        public async Task ChangeLog()
+        {
+            var client = Context.Client as DiscordSocketClient;
+            var hq = client.GetGuild(306467828729380874);
+            var changelogch = hq.Channels.FirstOrDefault(ch => ch.Name == "changelog") as ITextChannel;
+            var changelogmessages = await changelogch.GetMessagesAsync(100, CacheMode.AllowDownload).Flatten();
+            var msg = changelogmessages.FirstOrDefault(m => m.Content.StartsWith("**StatusBot")).Content;
+            await ReplyAsync(msg);
         }
 
         [Command("how")]
