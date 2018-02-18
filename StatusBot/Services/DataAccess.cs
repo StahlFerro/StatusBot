@@ -19,8 +19,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.REMINDERCONFIGs.FirstOrDefault(
-                    r => r.GuildID == Convert.ToInt64(G.Id) && r.BotID == Convert.ToInt64(Bot.Id));
+                return SC.REMINDERCONFIGs.FirstOrDefault(r => r.GuildID == G.Id && r.BotID == Bot.Id);
             }
         }
 
@@ -28,7 +27,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.REMINDERCONFIGs.Where(rc => rc.GuildID == Convert.ToInt64(G.Id)).ToList();
+                return SC.REMINDERCONFIGs.Where(rc => rc.GuildID == G.Id).ToList();
             }
         }
 
@@ -36,7 +35,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return GetListenerList(G, Bot).FirstOrDefault(l => l.UserID == Convert.ToInt64(Listener.Id));
+                return GetListenerList(G, Bot).FirstOrDefault(l => l.UserID == Listener.Id);
             }
         }
 
@@ -64,8 +63,8 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {
                 var RC = new REMINDERCONFIG();
-                RC.GuildID = Convert.ToInt64(G.Id);
-                RC.BotID = Convert.ToInt64(Bot.Id);
+                RC.GuildID = G.Id;
+                RC.BotID = Bot.Id;
                 RC.Active = x;
                 RC.ListenerList = new List<LISTENER>() { };
                 await SC.AddAsync(RC);
@@ -78,8 +77,7 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {   
                 //Not using GetReminder(G, Bot) in order for the entity to be tracked by the context to be updated
-                var RC = SC.REMINDERCONFIGs.FirstOrDefault( 
-                    r => r.GuildID == Convert.ToInt64(G.Id) && r.BotID == Convert.ToInt64(Bot.Id));
+                var RC = SC.REMINDERCONFIGs.FirstOrDefault(r => r.GuildID == G.Id && r.BotID == Bot.Id);
                 RC.Active = x;
                 await SC.SaveChangesAsync();
             }
@@ -100,7 +98,7 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {
                 var L = new LISTENER();
-                L.UserID = Convert.ToInt64(Listener.Id);
+                L.UserID = Listener.Id;
                 L.ReminderIDFK = GetReminderConfig(G, Bot).ReminderID;
                 await SC.AddAsync(L); //Adds the Listener to the LISTENERs table
                 await SC.SaveChangesAsync();

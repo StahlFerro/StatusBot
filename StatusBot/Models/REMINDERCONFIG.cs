@@ -11,9 +11,9 @@ namespace StatusBot.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ReminderID { get; set; }
-        public long GuildID { get; set; }
-        public long BotID { get; set; }
+        public ulong ReminderID { get; set; }
+        public ulong GuildID { get; set; }
+        public ulong BotID { get; set; }
         public bool Active { get; set; }
         public List<LISTENER> ListenerList { get; set; }
     }

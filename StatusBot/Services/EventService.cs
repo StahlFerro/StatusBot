@@ -68,9 +68,9 @@ namespace StatusBot.Services
                 if (!listenerlist.Any()) return;
                 foreach (var listener in listenerlist)
                 {
-                    var U = Program.client.GetUser(Convert.ToUInt64(listener.UserID));
+                    var U = Program.client.GetUser(listener.UserID);
                     var dmch = await U.GetOrCreateDMChannelAsync();
-                    await dmch.SendMessageAsync($"{after} is offline");
+                    await dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC");
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline");
                     File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline\n");

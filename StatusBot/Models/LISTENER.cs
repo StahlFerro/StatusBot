@@ -12,10 +12,10 @@ namespace StatusBot.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ListenerID { get; set; }
-        public long UserID { get; set; }
+        public ulong UserID { get; set; }
 
         [ForeignKey("ReminderIDFK")]
         public REMINDERCONFIG ReminderConfig { get; set; }
-        public long ReminderIDFK { get; set; }
+        public ulong ReminderIDFK { get; set; }
     }
 }

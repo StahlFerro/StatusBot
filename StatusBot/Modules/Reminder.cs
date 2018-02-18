@@ -34,7 +34,7 @@ namespace StatusBot.Modules
                     string rcstatus;
                     if (rc.Active) rcstatus = "Active";
                     else rcstatus = "Inactive";
-                    desc += $"{G.GetUser(Convert.ToUInt64(rc.BotID))} ({rc.BotID}) | {rcstatus} | {listenerlist.Count} listener(s)\n";
+                    desc += $"{G.GetUser(rc.BotID)} ({rc.BotID}) | {rcstatus} | {listenerlist.Count} listener(s)\n";
                 }
                 if (String.IsNullOrWhiteSpace(desc)) desc = "No bot reminders yet. Cri";
                 E.WithTitle($"{G.Name} reminders").WithDescription(desc);
@@ -45,7 +45,7 @@ namespace StatusBot.Modules
                 if (reminder == null) { await ReplyAsync("⛔ Reminder not found"); return; }
                 foreach (var listener in DA.GetListenerList(G, Bot))
                 {
-                    desc += $"{G.GetUser(Convert.ToUInt64(listener.UserID))} ({listener.UserID})\n";
+                    desc += $"{G.GetUser(listener.UserID)} ({listener.UserID})\n";
                 }
                 if (String.IsNullOrWhiteSpace(desc)) desc = "No listeners for this reminder yet. Cri";
                 string rcstatus;

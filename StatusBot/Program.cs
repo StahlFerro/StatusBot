@@ -29,7 +29,7 @@ namespace StatusBot
             File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true
             });
             ES = new EventService(client);
