@@ -10,7 +10,7 @@ Although SQLite is the best choice for StatusBot, you are not restricted to othe
 1. Add the respective database provider of your choice. [List of providers](https://docs.microsoft.com/en-us/ef/core/providers/)
 1. Change the statement inside the OnConfiguring method on the [StatusBotContext.cs](https://github.com/StahlFerro/StatusBot/blob/master/StatusBot/Services/StatusBotContext.cs) statement to your chosen provider
 
-## Hosting on Raspberry Pi (*new in 2.1.5!*)
+## Hosting on Raspberry Pi *(new!)*
 Publishing StatusBot with dotnet publish is pretty straight forward:
 1. Use the following command to publish the app for your Pi: `dotnet publish -c Release -r linux-arm`
 2. Copy the entire `publish` folder inside the generated `linux-arm` folder into your Pi

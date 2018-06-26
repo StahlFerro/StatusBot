@@ -16,5 +16,8 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="1.1.11" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Logs\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Database\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="token.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
