@@ -36,7 +36,7 @@ namespace StatusBot.Services
                     cc = ConsoleColor.DarkGray; break;
             }
             Console.WriteLine($"{DateTime.Now.ToShortDateString()} {msg.ToString()}");
-            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToShortDateString()} {msg.ToString()}\n");
+            File.AppendAllText(Program.logpath, $"{DateTime.Now.ToShortDateString()} {msg.ToString()}\n");
             return Task.CompletedTask;
         }
 
@@ -48,7 +48,7 @@ namespace StatusBot.Services
                 var ch = msg.Channel as IGuildChannel;
                 var G = ch.Guild as IGuild;
                 Console.WriteLine($"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}");
-                File.AppendAllText("logfile.txt", $"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}\n");
+                File.AppendAllText(Program.logpath, $"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}\n");
             }
             await Task.CompletedTask;
         }
@@ -73,7 +73,7 @@ namespace StatusBot.Services
                     await dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC");
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline");
-                    File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline\n");
+                    File.AppendAllText(Program.logpath, $"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline\n");
                     Console.ResetColor();
                 }
             }

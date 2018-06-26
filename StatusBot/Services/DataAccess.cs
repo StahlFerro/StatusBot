@@ -62,10 +62,12 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                var RC = new REMINDERCONFIG();
-                RC.GuildID = G.Id;
-                RC.BotID = Bot.Id;
-                RC.Active = x;
+                var RC = new REMINDERCONFIG
+                {
+                    GuildID = G.Id,
+                    BotID = Bot.Id,
+                    Active = x,
+                };
                 RC.ListenerList = new List<LISTENER>() { };
                 await SC.AddAsync(RC);
                 await SC.SaveChangesAsync();
@@ -97,9 +99,11 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                var L = new LISTENER();
-                L.UserID = Listener.Id;
-                L.ReminderIDFK = GetReminderConfig(G, Bot).ReminderID;
+                var L = new LISTENER
+                {
+                    UserID = Listener.Id,
+                    ReminderIDFK = GetReminderConfig(G, Bot).ReminderID,
+                };
                 await SC.AddAsync(L); //Adds the Listener to the LISTENERs table
                 await SC.SaveChangesAsync();
             }

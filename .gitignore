@@ -9,6 +9,8 @@
 *.txt
 *.db
 Migrations/
+Logs/
+Database/
 
 
 # User-specific files

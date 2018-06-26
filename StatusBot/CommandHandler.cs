@@ -25,7 +25,7 @@ namespace StatusBot
         {
             T.Stop();
             Console.WriteLine($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds");
-            File.AppendAllText("logfile.txt", $"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
+            File.AppendAllText(Program.logpath, $"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
         }
 
         public CommandHandler(IServiceProvider provider)
@@ -69,7 +69,7 @@ namespace StatusBot
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"{result.ToString()}");
                 Console.ResetColor();
-                File.AppendAllText("logfile.txt", $"{result.ToString()}\n");
+                File.AppendAllText(Program.logpath, $"{result.ToString()}\n");
             }
         }
     }

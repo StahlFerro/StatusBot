@@ -17,6 +17,7 @@ namespace StatusBot
         private CommandHandler handler;
         public DataAccess DA;
         public EventService ES;
+        public static string logpath;
 
         static Program()
         {
@@ -24,13 +25,15 @@ namespace StatusBot
 
         public async Task Start()
         {
+            logpath = "Logs/logfile.txt";
             DA = new DataAccess();
             Console.WriteLine($"{DateTime.Now.ToLocalTime()} Starting StatusBot");
-            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
+            File.AppendAllText(logpath, $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                AlwaysDownloadUsers = true
+                AlwaysDownloadUsers = true,
+                DefaultRetryMode = RetryMode.AlwaysRetry
             });
             ES = new EventService(client);
             client.Log += ES.Log;
@@ -41,7 +44,7 @@ namespace StatusBot
             await client.StartAsync();
             time.Stop();
             Console.WriteLine($"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds");
-            File.AppendAllText("logfile.txt", $"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
+            File.AppendAllText(logpath, $"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
 
             handler = new CommandHandler(serviceprovider);
             await handler.ConfigureAsync();

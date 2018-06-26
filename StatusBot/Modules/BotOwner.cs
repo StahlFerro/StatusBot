@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord.Net;
+using System.Diagnostics;
 
 
 namespace StatusBot.Modules
@@ -38,16 +40,20 @@ namespace StatusBot.Modules
             Environment.Exit(0);
         }
 
-        [Command("setgame")]
+        [Command("setpresence")]
         [Summary("Sets the game of StatusBot. Creator only")]
         [RequireContext(ContextType.Guild)]
         [RequireOwner]
-        public async Task SetGame([Remainder] string game = null)
+        public async Task SetPresence(string option, [Remainder] string game = null)
         {
             var client = Context.Client as DiscordSocketClient;
-            await client.SetGameAsync(game, streamType: StreamType.NotStreaming);
-            if (game == null) await Context.Channel.SendMessageAsync("Successfully reset current game");
-            else await Context.Channel.SendMessageAsync($"Successfully set game to {game}");
+            var presence = StreamType.NotStreaming;
+            if (option == "-game") presence = StreamType.NotStreaming;
+            else if (option == "-stream") presence = StreamType.Twitch;
+            else {await ReplyAsync("Unknown stream type"); return;}
+            await client.SetGameAsync(game, streamType: presence);
+            if (game == null) await Context.Channel.SendMessageAsync("Successfully reset current presence");
+            else await Context.Channel.SendMessageAsync($"Successfully set presence to {game}");
         }
     }
 }
