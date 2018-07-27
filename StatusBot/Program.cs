@@ -17,25 +17,23 @@ namespace StatusBot
         private CommandHandler handler;
         public DataAccess DA;
         public EventService ES;
-        public static string logpath;
-
+        public LogService _logservice;
         static Program()
         {
         }
 
         public async Task Start()
         {
-            logpath = "Logs/logfile.txt";
             DA = new DataAccess();
-            Console.WriteLine($"{DateTime.Now.ToLocalTime()} Starting StatusBot");
-            File.AppendAllText(logpath, $"{DateTime.Now.ToLocalTime()} Starting StatusBot\n");
+            _logservice = new LogService();
+            await _logservice.Write("Starting StatusBot", ConsoleColor.DarkGreen);
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true,
                 DefaultRetryMode = RetryMode.AlwaysRetry
             });
-            ES = new EventService(client);
+            ES = new EventService(client, _logservice, DA);
             client.Log += ES.Log;
             var serviceprovider = ConfigureServices();
             string token = File.ReadAllText("token.txt");
@@ -43,8 +41,7 @@ namespace StatusBot
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
             time.Stop();
-            Console.WriteLine($"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds");
-            File.AppendAllText(logpath, $"{DateTime.Now.ToLocalTime()} Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
+            await _logservice.Write($"Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkGreen);
 
             handler = new CommandHandler(serviceprovider);
             await handler.ConfigureAsync();
@@ -61,7 +58,9 @@ namespace StatusBot
         {
             var services = new ServiceCollection()
                 .AddSingleton(client)
-                .AddSingleton(new CommandService());
+                .AddSingleton(new CommandService())
+                .AddSingleton(_logservice)
+                .AddSingleton(DA);
             var provider = services.BuildServiceProvider();
             return provider;
         }

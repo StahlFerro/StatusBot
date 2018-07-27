@@ -23,7 +23,7 @@ namespace StatusBot.Modules
             var E = new EmbedBuilder()
                 .WithColor(new Color(200, 200, 200))
                 .WithDescription("Restarting...");
-            await Context.Channel.SendMessageAsync("", embed: E);
+            await Context.Channel.SendMessageAsync("", embed: E.Build());
             Environment.Exit(1);
         }
 
@@ -36,22 +36,18 @@ namespace StatusBot.Modules
             var E = new EmbedBuilder()
                 .WithColor(new Color(200, 200, 200))
                 .WithDescription("Shutting down...");
-            await Context.Channel.SendMessageAsync("", embed: E);
+            await Context.Channel.SendMessageAsync("", embed: E.Build());
             Environment.Exit(0);
         }
 
-        [Command("setpresence")]
+        [Command("setgame")]
         [Summary("Sets the game of StatusBot. Creator only")]
         [RequireContext(ContextType.Guild)]
         [RequireOwner]
-        public async Task SetPresence(string option, [Remainder] string game = null)
+        public async Task SetPresence(ActivityType type, [Remainder] string game = null)
         {
             var client = Context.Client as DiscordSocketClient;
-            var presence = StreamType.NotStreaming;
-            if (option == "-game") presence = StreamType.NotStreaming;
-            else if (option == "-stream") presence = StreamType.Twitch;
-            else {await ReplyAsync("Unknown stream type"); return;}
-            await client.SetGameAsync(game, streamType: presence);
+            await client.SetGameAsync(game, type: type);
             if (game == null) await Context.Channel.SendMessageAsync("Successfully reset current presence");
             else await Context.Channel.SendMessageAsync($"Successfully set presence to {game}");
         }

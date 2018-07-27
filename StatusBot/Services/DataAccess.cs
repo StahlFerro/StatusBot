@@ -118,5 +118,13 @@ namespace StatusBot.Services
                 await SC.SaveChangesAsync();
             }
         }
+
+        public BotConfig GetBotConfig(SocketSelfUser Bot)
+        {
+            using (StatusBotContext SC = new StatusBotContext())
+            {
+                return SC.BotConfigs.FirstOrDefault(c => c.BotID == Bot.Id);
+            }
+        }
     }
 }

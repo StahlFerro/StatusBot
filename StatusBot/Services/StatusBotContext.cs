@@ -10,11 +10,11 @@ namespace StatusBot.Services
     {
         public DbSet<REMINDERCONFIG> REMINDERCONFIGs { get; set; }
         public DbSet<LISTENER> LISTENERs { get; set; }
+        public DbSet<BotConfig> BotConfigs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=./Services/StatusBot.db");
-            //optionsBuilder.UseSqlServer(@"Server=user\sqlexpress;Database=StatusBot;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlite("Data Source=./Database/StatusBot.db");
         }
     }
 }

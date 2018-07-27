@@ -3,17 +3,28 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Net;
+using StatusBot.Services;
 
 
 namespace StatusBot.Modules.Utility
 {
     public class Utility : ModuleBase
     {
-        public Discord.Color color = new Discord.Color(0, 138, 168);
+        public Discord.Color color;
+        private IServiceProvider ISP;
+        private DataAccess DA;
+
+        public Utility(IServiceProvider provider)
+        {
+            color = new Discord.Color(0, 138, 168);
+            ISP = provider;
+            DA = ISP.GetService<DataAccess>();
+        }
 
         [Command("ping")]
         [Summary("Checks the latency of the bot")]
@@ -24,41 +35,44 @@ namespace StatusBot.Modules.Utility
             var E = new EmbedBuilder()
                 .WithColor(color)
                 .WithTitle($":satellite_orbital: Beep!  |  {client.Latency}ms");
-            await ReplyAsync("", embed: E);
+            await ReplyAsync("", embed: E.Build());
         }
 
         [Command("about")]
         [Summary("See StatusBot's info")]
         [RequireContext(ContextType.Guild)]
+        [RequireBotPermission(GuildPermission.SendMessages)]
         public async Task BotInfo()
         {
             var client = Context.Client as DiscordSocketClient;
             var cdate = client.CurrentUser.CreatedAt.DateTime;
+            var botconfig = DA.GetBotConfig(client.CurrentUser);
+            var hq = client.GetGuild(botconfig.HeadquartersGuildID);
+            //var invs = await hq.GetInvitesAsync();
+            //var non_expire_inv = invs.FirstOrDefault(i => i.MaxAge == null);
             var E = new EmbedBuilder()
                 .WithColor(color)
-                .WithTitle("StatusBot v2.1.3")
+                .WithTitle($"StatusBot v{botconfig.VersionNumber}")
                 .WithDescription("Hello there. I'm StatusBot. An ultra simple configurable bot to remind users of another bot going offline. " +
                 "I'm built to assist on special cases and not intended for public use. But if you want to test around my capability in a server, please contact my creator")
-                .AddInlineField("Creator", "StahlFerro#0055")
-                .AddInlineField($"Creation date ({(DateTime.Now - cdate).Days}d old)", $"{cdate}")
-                .AddInlineField("Library", $"<:dotnet:315951014156959744> Discord.NET v{ DiscordSocketConfig.Version}")
-                .AddInlineField("Bot ID", 332603467577425929)
-                .AddInlineField("Latency", client.Latency + "ms")
-                .AddInlineField("Links",
-                $"[Development server](https://discord.gg/GRBeCAX)\n" +
-                $"[Github](https://github.com/StahlFerro/StatusBot)")
-                ;
-            await Context.Channel.SendMessageAsync("", embed: E);
+                .AddField("Creator", "StahlFerro#0055", inline: true)
+                .AddField($"Creation date ({(DateTime.Now - cdate).Days}d old)", $"{cdate}", inline: true)
+                .AddField("Library", $"<:dotnet:315951014156959744> Discord.NET v{DiscordSocketConfig.Version}", inline: true)
+                .AddField("Bot ID", Context.Client.CurrentUser.Id, inline: true)
+                .AddField("Latency", client.Latency + "ms", inline: true)
+                .AddField("Links", $"[Github](https://github.com/StahlFerro/StatusBot)", inline: true);
+            await Context.Channel.SendMessageAsync("", embed: E.Build());
         }
 
         [Command("changelog")]
         [Summary("Displays the latest changelog of the bot")]
+        [RequireBotPermission(GuildPermission.SendMessages)]
         public async Task ChangeLog()
         {
             var client = Context.Client as DiscordSocketClient;
             var hq = client.GetGuild(306467828729380874);
-            var changelogch = hq.Channels.FirstOrDefault(ch => ch.Name == "changelog") as ITextChannel;
-            var changelogmessages = await changelogch.GetMessagesAsync(100, CacheMode.AllowDownload).Flatten();
+            var changelogch = hq.Channels.FirstOrDefault(ch => ch.Name == "changelog") as SocketTextChannel;
+            var changelogmessages = await changelogch.GetMessagesAsync(100).FlattenAsync();
             var msg = changelogmessages.FirstOrDefault(m => m.Content.StartsWith("**StatusBot")).Content;
             await ReplyAsync(msg);
         }
@@ -77,7 +91,7 @@ namespace StatusBot.Modules.Utility
 
                 "So here's an example, when you set the following config on a server where " +
                 "Active is set as `true`, SomeBot is set as `Bot`, You as `Listener`, " +
-                "I will DM you if the poor little has it's status set as offline aka dies. __The bot MUST be " +
+                "I will DM you if the poor little thing has it's status set as offline aka dies. __The bot MUST be " +
                 "in the same server where you set up this config or else I won't be able tell you that your precious " +
                 "bot got rekt__\n\n" +
 

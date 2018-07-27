@@ -12,19 +12,23 @@ namespace StatusBot.Services
 {
     public class EventService
     {
-        DiscordSocketClient client;
-        public EventService(DiscordSocketClient _client)
+        DiscordSocketClient _client;
+        LogService _logservice;
+        DataAccess DA;
+        public EventService(DiscordSocketClient client, LogService logservice, DataAccess dataAccess)
         {
-            client = _client;
+            _client = client;
+            _logservice = logservice;
+            DA = dataAccess;
         }
-        DataAccess DA = new DataAccess();
 
-        public Task Log(LogMessage msg) //For built-in Discord.Net logging feature that logs to console and logfile
+        public async Task Log(LogMessage msg) //For built-in Discord.Net logging feature that logs to console and logfile
         {
             var cc = Console.ForegroundColor;
             switch (msg.Severity)
             {
                 case LogSeverity.Critical:
+                    cc = ConsoleColor.DarkRed; break;
                 case LogSeverity.Error:
                     cc = ConsoleColor.Red; break;
                 case LogSeverity.Warning:
@@ -32,12 +36,12 @@ namespace StatusBot.Services
                 case LogSeverity.Info:
                     cc = ConsoleColor.White; break;
                 case LogSeverity.Verbose:
+                    cc = ConsoleColor.DarkGray; break;
                 case LogSeverity.Debug:
                     cc = ConsoleColor.DarkGray; break;
             }
-            Console.WriteLine($"{DateTime.Now.ToShortDateString()} {msg.ToString()}");
-            File.AppendAllText(Program.logpath, $"{DateTime.Now.ToShortDateString()} {msg.ToString()}\n");
-            return Task.CompletedTask;
+            await _logservice.Write(msg.ToString(), cc, TimeAppend.Short);
+            await Task.CompletedTask;
         }
 
         public async Task MessageReceived(SocketMessage msg)
@@ -47,15 +51,14 @@ namespace StatusBot.Services
             {
                 var ch = msg.Channel as IGuildChannel;
                 var G = ch.Guild as IGuild;
-                Console.WriteLine($"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}");
-                File.AppendAllText(Program.logpath, $"{msg.CreatedAt.LocalDateTime} [{G.Name}] ({msg.Channel}) {msg.Author}: {msg.Content}\n");
+                await _logservice.Write($"[{msg.Author}] {msg}", ConsoleColor.Green);
             }
             await Task.CompletedTask;
         }
 
         public async Task AutoSetGame()
         {
-            await client.SetGameAsync("type s]h");
+            await _client.SetGameAsync(DA.GetBotConfig(_client.CurrentUser).DefaultGame);
         }
 
         public async Task AutoPM(SocketGuildUser before, SocketGuildUser after)
@@ -71,10 +74,7 @@ namespace StatusBot.Services
                     var U = Program.client.GetUser(listener.UserID);
                     var dmch = await U.GetOrCreateDMChannelAsync();
                     await dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC");
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline");
-                    File.AppendAllText(Program.logpath, $"{DateTime.Now.ToLocalTime()} Successfully PM'd {U} that {after} is offline\n");
-                    Console.ResetColor();
+                    await _logservice.Write($"Successfully PM'd {U} that {after} is offline", ConsoleColor.Cyan);
                 }
             }
         }

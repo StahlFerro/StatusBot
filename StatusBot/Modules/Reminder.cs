@@ -14,6 +14,7 @@ namespace StatusBot.Modules
     public class Reminder : ModuleBase
     {
         public Discord.Color color = new Discord.Color(0, 138, 168);
+
         DataAccess DA = new DataAccess();
 
         [Command("rmd")]
@@ -53,7 +54,7 @@ namespace StatusBot.Modules
                 else rcstatus = "Inactive";
                 E.WithTitle($"Listeners of {Bot} ({Bot.Id}) | {rcstatus}").WithDescription(desc);
             }
-            await ReplyAsync("", embed: E);
+            await ReplyAsync("", embed: E.Build());
         }
 
         [Command("addrmd")]

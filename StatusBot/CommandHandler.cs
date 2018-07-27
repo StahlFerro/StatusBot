@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using StatusBot.Services;
 
 namespace StatusBot
 {
@@ -15,18 +15,14 @@ namespace StatusBot
         private CommandService C;
         private DiscordSocketClient client;
         private IServiceProvider ISP;
+        private LogService _logservice;
         Stopwatch T = new Stopwatch();
 
         void SWatchStart()
-        {
-            T = Stopwatch.StartNew();
-        }
+            => T = Stopwatch.StartNew();
+
         void SWatchStop()
-        {
-            T.Stop();
-            Console.WriteLine($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds");
-            File.AppendAllText(Program.logpath, $"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds\n");
-        }
+            => T.Stop();
 
         public CommandHandler(IServiceProvider provider)
         {
@@ -34,6 +30,7 @@ namespace StatusBot
             client = ISP.GetService<DiscordSocketClient>();
             client.MessageReceived += HandleCommand;
             C = ISP.GetService<CommandService>();
+            _logservice = ISP.GetService<LogService>();
         }
 
         public async Task ConfigureAsync()
@@ -44,11 +41,10 @@ namespace StatusBot
         public async Task HandleCommand(SocketMessage parameterMessage)
         {
             SWatchStart();
-            var message = parameterMessage as SocketUserMessage;
             var ch = parameterMessage.Channel as IGuildChannel;
             var G = ch.Guild as IGuild;
             //Prevent commands triggered by itself or other bots
-            if (message == null || message.Author.IsBot) return;
+            if (!(parameterMessage is SocketUserMessage message) || message.Author.IsBot) return;
             int argPos = 0;
             if (!(message.HasMentionPrefix(client.CurrentUser, ref argPos) || message.HasStringPrefix("s]", ref argPos))) return;
             var context = new CommandContext(client, message);
@@ -57,19 +53,15 @@ namespace StatusBot
             //Command success/fail notice message
             if (result.IsSuccess)
             {
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 SWatchStop();
-                Console.ResetColor();
+                await _logservice.Write($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkMagenta);
             }
             else
             {
                 //Prevents unknown command exception to be posted as the error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ToString());
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"{result.ToString()}");
-                Console.ResetColor();
-                File.AppendAllText(Program.logpath, $"{result.ToString()}\n");
+                await _logservice.Write($"{result}", ConsoleColor.DarkRed);
             }
         }
     }
