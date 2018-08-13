@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -13,9 +14,15 @@ namespace StatusBot.Modules
 {
     public class Reminder : ModuleBase
     {
-        public Discord.Color color = new Discord.Color(0, 138, 168);
+        public Discord.Color color;
 
-        DataAccess DA = new DataAccess();
+        private DataAccess DA;
+
+        public Reminder(IServiceProvider ISP)
+        {
+            DA = ISP.GetService<DataAccess>();
+            color = new Discord.Color(0, 138, 168);
+        }
 
         [Command("rmd")]
         [Summary("Displays guild bot reminders")]

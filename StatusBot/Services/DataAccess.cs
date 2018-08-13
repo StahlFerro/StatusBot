@@ -4,6 +4,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
+using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -124,6 +127,31 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {
                 return SC.BotConfigs.FirstOrDefault(c => c.BotID == Bot.Id);
+            }
+        }
+
+        public async Task<List<List<string>>> ExecSql(string query)
+        {
+            using (StatusBotContext SC = new StatusBotContext())
+            {
+                var db = SC.Database;
+                DbCommand command = db.GetDbConnection().CreateCommand();
+                command.CommandText = query;
+                await db.OpenConnectionAsync();
+                DbDataReader reader = await command.ExecuteReaderAsync();
+
+                var columnNames = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName).ToList();
+                var records = new List<List<string>>();
+                records.Add(columnNames);
+                while (await reader.ReadAsync())
+                {
+                    var row = new List<string>();
+                    foreach (var colname in columnNames)
+                        row.Add(reader[colname].ToString());
+                    records.Add(row);
+                }
+                reader.Close();
+                return records;
             }
         }
     }
