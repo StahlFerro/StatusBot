@@ -58,7 +58,7 @@ namespace StatusBot
             }
             else
             {
-                //Prevents unknown command exception to be posted as the error message in discord
+                //Prevents unknown command exception to be posted as an error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ToString());
                 await _logservice.Write($"{result}", ConsoleColor.DarkRed);

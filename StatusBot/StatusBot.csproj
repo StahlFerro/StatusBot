@@ -21,4 +21,9 @@
     <Content Include="Database\**\*" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="token.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

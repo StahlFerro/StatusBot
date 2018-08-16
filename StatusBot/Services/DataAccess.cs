@@ -18,6 +18,14 @@ namespace StatusBot.Services
 {
     public class DataAccess
     {
+
+        private readonly Formatter F;
+
+        public DataAccess(Formatter formatter)
+        {
+            F = formatter;
+        }
+
         public REMINDERCONFIG GetReminderConfig(SocketGuild G, SocketGuildUser Bot)
         {
             using (StatusBotContext SC = new StatusBotContext())
@@ -147,7 +155,10 @@ namespace StatusBot.Services
                 {
                     var row = new List<string>();
                     foreach (var colname in columnNames)
-                        row.Add(reader[colname].ToString());
+                    {
+                        string data = F.EscapeCSV(reader[colname].ToString());
+                        row.Add(data);
+                    }
                     records.Add(row);
                 }
                 reader.Close();
