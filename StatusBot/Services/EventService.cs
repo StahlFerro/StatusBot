@@ -36,9 +36,9 @@ namespace StatusBot.Services
                 case LogSeverity.Info:
                     cc = ConsoleColor.White; break;
                 case LogSeverity.Verbose:
-                    cc = ConsoleColor.DarkGray; break;
+                    cc = ConsoleColor.White; break;
                 case LogSeverity.Debug:
-                    cc = ConsoleColor.DarkGray; break;
+                    cc = ConsoleColor.White; break;
             }
             await _logservice.Write(msg.ToString(), cc, TimeAppend.Short);
             await Task.CompletedTask;
