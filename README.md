@@ -4,6 +4,8 @@ StatusBot is a simple .NET Core discord bot that PM's a user if another bot goes
 
 So far this bot is only used for testing and to assist on special cases only. It's not intended for public use as this bot is still experimental. But if you're interested in testing it, either visit it's development [discord server](https://discord.gg/HPpxujb) and message me, or PM me on discord for further info.
 
+**Warning** StatusBot 3.0.1 (v3) is now deprecated and replaced with 4.0.0 (master) which introduces breaking changes o mainly the database models.
+
 ## Database
 For anyone trying to run their own local instance or self-hosting StatusBot, it requires an SQLite database which should be named StatusBot.db in the Database folder.
 Although SQLite is the best choice for StatusBot, you are not restricted to other database providers but they might restrict you from compatible hosting platforms. If you want to change do not forget to:
