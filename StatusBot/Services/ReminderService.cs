@@ -27,17 +27,11 @@ namespace StatusBot.Services
 
         public async Task RemindUsers(SocketGuildUser before, SocketGuildUser after)
         {
-            Console.WriteLine("triggered");
             var G = before.Guild;
-            Console.WriteLine(G.Name);
             var R = DS.GetReminderConfig(G, before);
-            Console.WriteLine("ok?");
-            Console.WriteLine((R == null).ToString());
-            Console.WriteLine($"{R.ReminderId} {R.GuildId} {R.BotId} {R.Duration}");
             if (!R.Active)
                 return;
             var listenerlist = DS.GetListenerList(G, before);
-            Console.WriteLine(string.Join(", ", listenerlist.Select(l => l.UserID)));
             if (!listenerlist.Any()) return;
             TimeSpan duration = TimeSpan.FromSeconds(R.Duration);
             Timer ping_timer = new Timer(async _ => {

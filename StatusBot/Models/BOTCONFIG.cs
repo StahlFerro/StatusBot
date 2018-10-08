@@ -14,5 +14,6 @@ namespace StatusBot.Models
         public ulong HeadquartersGuildId { get; set; }
         public string VersionNumber { get; set; }
         public string DefaultGame { get; set; }
+
     }
 }

@@ -12,7 +12,6 @@ namespace StatusBot.Models
         public DbSet<Listener> Listeners { get; set; }
         public DbSet<BotConfig> BotConfigs { get; set; }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=./Database/StatusBot.db");

@@ -17,5 +17,6 @@ namespace StatusBot.Models
         [ForeignKey("ReminderId")]
         public Reminder Reminder { get; set; }
         public ulong ReminderId { get; set; }
+
     }
 }

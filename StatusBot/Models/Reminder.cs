@@ -17,5 +17,6 @@ namespace StatusBot.Models
         public bool Active { get; set; }
         public int Duration { get; set; }
         public ICollection<Listener> Listeners { get; set; }
+
     }
 }

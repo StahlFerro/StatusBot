@@ -81,10 +81,8 @@ namespace StatusBot.Services
         {
             Task.Run(async () =>
             {
-                Console.WriteLine(before.ToString());
                 if (before.IsBot && after.Status == UserStatus.Offline)
                 {
-                    Console.WriteLine("Offline listener triggered");
                     await RS.RemindUsers(before, after);
                 }
             });
