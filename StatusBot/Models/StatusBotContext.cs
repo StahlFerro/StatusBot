@@ -4,13 +4,14 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using StatusBot.Models;
 
-namespace StatusBot.Services
+namespace StatusBot.Models
 {
     public class StatusBotContext : DbContext
     {
-        public DbSet<REMINDERCONFIG> REMINDERCONFIGs { get; set; }
-        public DbSet<LISTENER> LISTENERs { get; set; }
+        public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<Listener> Listeners { get; set; }
         public DbSet<BotConfig> BotConfigs { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

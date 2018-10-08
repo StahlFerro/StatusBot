@@ -10,10 +10,9 @@ namespace StatusBot.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public ulong BotID { get; set; }
-        public ulong HeadquartersGuildID { get; set; }
+        public ulong BotId { get; set; }
+        public ulong HeadquartersGuildId { get; set; }
         public string VersionNumber { get; set; }
         public string DefaultGame { get; set; }
-        public string InviteUrl { get; set; }
     }
 }

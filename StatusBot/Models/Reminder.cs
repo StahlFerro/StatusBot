@@ -7,14 +7,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StatusBot.Models
 {
-    public class REMINDERCONFIG
+    public class Reminder
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public ulong ReminderID { get; set; }
-        public ulong GuildID { get; set; }
-        public ulong BotID { get; set; }
+        public ulong ReminderId { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong BotId { get; set; }
         public bool Active { get; set; }
-        public List<LISTENER> ListenerList { get; set; }
+        public int Duration { get; set; }
+        public ICollection<Listener> Listeners { get; set; }
     }
 }

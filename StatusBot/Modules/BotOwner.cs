@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,13 +16,17 @@ using StatusBot.Services;
 
 namespace StatusBot.Modules
 {
-    public class BotOwner : ModuleBase
+    public class BotOwner : ModuleBase<SocketCommandContext>
     {
-        private DataAccess DA;
+        private DataService DA;
+        private TimerService TS;
+        Random R;
 
         public BotOwner(IServiceProvider ISP)
         {
-            DA = ISP.GetService<DataAccess>();
+            DA = ISP.GetService<DataService>();
+            TS = ISP.GetService<TimerService>();
+            R = new Random();
         }
 
         [Command("reboot")]
@@ -56,7 +61,7 @@ namespace StatusBot.Modules
         [RequireOwner]
         public async Task SetPresence(ActivityType type, [Remainder] string game = null)
         {
-            var client = Context.Client as DiscordSocketClient;
+            var client = Context.Client;
             await client.SetGameAsync(game, type: type);
             if (game == null) await Context.Channel.SendMessageAsync("Successfully reset current presence");
             else await Context.Channel.SendMessageAsync($"Successfully set presence to {game}");
@@ -108,6 +113,14 @@ namespace StatusBot.Modules
                     }
                 }
             }
+        }
+
+        [Command("timers", RunMode = RunMode.Async)]
+        [RequireOwner]
+        public async Task GetTimers()
+        {
+            if (!TS.Timers.Any()) { await ReplyAsync("No timers"); return; }
+            await ReplyAsync(string.Join("\n", TS.Timers.Select(t => $"{t.Key} {t.Value}")));
         }
     }
 }

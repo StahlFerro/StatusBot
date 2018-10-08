@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using StatusBot.Services;
 
@@ -13,13 +14,16 @@ namespace StatusBot.Services
     public class EventService
     {
         DiscordSocketClient _client;
-        LogService _logservice;
-        DataAccess DA;
-        public EventService(DiscordSocketClient client, LogService logservice, DataAccess dataAccess)
+        LogService LS;
+        DataService DS;
+        ReminderService RS;
+
+        public EventService(DiscordSocketClient client, LogService logservice, DataService dataService, ReminderService reminderService)
         {
             _client = client;
-            _logservice = logservice;
-            DA = dataAccess;
+            LS = logservice;
+            DS = dataService;
+            RS = reminderService;
         }
 
         public async Task Log(LogMessage msg) //For built-in Discord.Net logging feature that logs to console and logfile
@@ -40,7 +44,19 @@ namespace StatusBot.Services
                 case LogSeverity.Debug:
                     cc = ConsoleColor.White; break;
             }
-            await _logservice.Write(msg.ToString(), cc, TimeAppend.Short);
+            if (msg.Exception is CommandException CE)
+            {
+                var G = CE.Context.Guild;
+                var tch = CE.Context.Channel;
+                var U = CE.Context.User;
+                await LS.Write($"⚠ {CE.Command.Aliases.First()} exception ⚠\n" +
+                    $"Guild: {G.Name} ({G.Id})\n" +
+                    $"Channel: {tch.Name} ({tch.Id})\n" +
+                    $"User: {U} ({U.Id})\n" +
+                    $"Exception:\n" +
+                    $"{CE.Message}\n{CE.StackTrace}\n{CE.InnerException.Message}\n{CE.InnerException.StackTrace}");
+            }
+            await LS.Write(msg.ToString(), cc, TimeAppend.Short);
             await Task.CompletedTask;
         }
 
@@ -51,32 +67,28 @@ namespace StatusBot.Services
             {
                 var ch = msg.Channel as IGuildChannel;
                 var G = ch.Guild as IGuild;
-                await _logservice.Write($"[{msg.Author}] {msg}", ConsoleColor.Green);
+                await LS.Write($"[{msg.Author}] {msg}", ConsoleColor.Green);
             }
             await Task.CompletedTask;
         }
 
         public async Task AutoSetGame()
         {
-            await _client.SetGameAsync(DA.GetBotConfig(_client.CurrentUser).DefaultGame);
+            await _client.SetGameAsync(DS.GetBotConfig(_client.CurrentUser).DefaultGame);
         }
 
-        public async Task AutoPM(SocketGuildUser before, SocketGuildUser after)
+        public Task OfflineListener(SocketGuildUser before, SocketGuildUser after)
         {
-            var G = before.Guild;
-            var reminder = DA.GetReminderConfig(G, before);
-            if (before.IsBot && reminder.Active && after.Status == UserStatus.Offline)
+            Task.Run(async () =>
             {
-                var listenerlist = DA.GetListenerList(G, before);
-                if (!listenerlist.Any()) return;
-                foreach (var listener in listenerlist)
+                Console.WriteLine(before.ToString());
+                if (before.IsBot && after.Status == UserStatus.Offline)
                 {
-                    var U = Program.client.GetUser(listener.UserID);
-                    var dmch = await U.GetOrCreateDMChannelAsync();
-                    await dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC");
-                    await _logservice.Write($"Successfully PM'd {U} that {after} is offline", ConsoleColor.Cyan);
+                    Console.WriteLine("Offline listener triggered");
+                    await RS.RemindUsers(before, after);
                 }
-            }
+            });
+            return Task.CompletedTask;
         }
     }
 }

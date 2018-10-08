@@ -9,6 +9,7 @@
 *.txt
 *.db
 Migrations/
+v3_Old/
 Logs/
 Database/
 

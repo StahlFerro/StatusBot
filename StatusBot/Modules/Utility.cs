@@ -13,17 +13,17 @@ using StatusBot.Services;
 
 namespace StatusBot.Modules.Utility
 {
-    public class Utility : ModuleBase
+    public class Utility : ModuleBase<SocketCommandContext>
     {
         public Discord.Color color;
         private IServiceProvider ISP;
-        private DataAccess DA;
+        private DataService DA;
 
         public Utility(IServiceProvider provider)
         {
             color = new Discord.Color(0, 138, 168);
             ISP = provider;
-            DA = ISP.GetService<DataAccess>();
+            DA = ISP.GetService<DataService>();
         }
 
         [Command("ping")]
@@ -31,7 +31,7 @@ namespace StatusBot.Modules.Utility
         [RequireContext(ContextType.Guild)]
         public async Task Ping()
         {
-            var client = (DiscordSocketClient)Context.Client;
+            var client = Context.Client;
             var E = new EmbedBuilder()
                 .WithColor(color)
                 .WithTitle($":satellite_orbital: Beep!  |  {client.Latency}ms");
@@ -44,10 +44,10 @@ namespace StatusBot.Modules.Utility
         [RequireBotPermission(GuildPermission.SendMessages)]
         public async Task BotInfo()
         {
-            var client = Context.Client as DiscordSocketClient;
+            var client = Context.Client;
             var cdate = client.CurrentUser.CreatedAt.DateTime;
             var botconfig = DA.GetBotConfig(client.CurrentUser);
-            var hq = client.GetGuild(botconfig.HeadquartersGuildID);
+            var hq = client.GetGuild(botconfig.HeadquartersGuildId);
             //var invs = await hq.GetInvitesAsync();
             //var non_expire_inv = invs.FirstOrDefault(i => i.MaxAge == null);
             var E = new EmbedBuilder()
@@ -69,9 +69,9 @@ namespace StatusBot.Modules.Utility
         [RequireBotPermission(GuildPermission.SendMessages)]
         public async Task ChangeLog()
         {
-            var client = Context.Client as DiscordSocketClient;
+            var client = Context.Client;
             var hq = client.GetGuild(306467828729380874);
-            var changelogch = hq.Channels.FirstOrDefault(ch => ch.Name == "changelog") as SocketTextChannel;
+            var changelogch = hq.TextChannels.FirstOrDefault(ch => ch.Name == "changelog");
             var changelogmessages = await changelogch.GetMessagesAsync(100).FlattenAsync();
             var msg = changelogmessages.FirstOrDefault(m => m.Content.StartsWith("**StatusBot")).Content;
             await ReplyAsync(msg);

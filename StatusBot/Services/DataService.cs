@@ -16,33 +16,26 @@ using StatusBot.Models;
 
 namespace StatusBot.Services
 {
-    public class DataAccess
+    public class DataService
     {
 
-        private readonly Formatter F;
-
-        public DataAccess(Formatter formatter)
-        {
-            F = formatter;
-        }
-
-        public REMINDERCONFIG GetReminderConfig(SocketGuild G, SocketGuildUser Bot)
+        public Reminder GetReminderConfig(SocketGuild G, SocketGuildUser Bot)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.REMINDERCONFIGs.FirstOrDefault(r => r.GuildID == G.Id && r.BotID == Bot.Id);
+                return SC.Reminders.FirstOrDefault(r => r.GuildId == G.Id && r.BotId == Bot.Id);
             }
         }
 
-        public List<REMINDERCONFIG> GetGuildReminders(SocketGuild G)
+        public List<Reminder> GetGuildReminders(SocketGuild G)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.REMINDERCONFIGs.Where(rc => rc.GuildID == G.Id).ToList();
+                return SC.Reminders.Where(rc => rc.GuildId == G.Id).ToList();
             }
         }
 
-        public LISTENER GetListener(SocketGuild G, SocketGuildUser Bot, SocketGuildUser Listener)
+        public Listener GetListener(SocketGuild G, SocketGuildUser Bot, SocketGuildUser Listener)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
@@ -50,36 +43,37 @@ namespace StatusBot.Services
             }
         }
 
-        public List<LISTENER> GetListenerList(SocketGuild G, SocketGuildUser Bot)
+        public List<Listener> GetListenerList(SocketGuild G, SocketGuildUser Bot)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
                 var RC = GetReminderConfig(G, Bot);
-                var ReminderId = RC.ReminderID;
-                return SC.LISTENERs.Where(l => l.ReminderIDFK == ReminderId).ToList();
+                var ReminderId = RC.ReminderId;
+                return SC.Listeners.Where(l => l.ReminderId == ReminderId).ToList();
             }
         }
 
-        public List<LISTENER> GetListenerList(REMINDERCONFIG RC)
+        public List<Listener> GetListenerList(Reminder RC)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                var ReminderId = RC.ReminderID;
-                return SC.LISTENERs.Where(l => l.ReminderIDFK == ReminderId).ToList();
+                var ReminderId = RC.ReminderId;
+                return SC.Listeners.Where(l => l.ReminderId == ReminderId).ToList();
             }
         }
 
-        public async Task AddReminder(SocketGuild G, SocketGuildUser Bot, bool x)
+        public async Task AddReminder(SocketGuild G, SocketGuildUser Bot, bool x, int duration)
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                var RC = new REMINDERCONFIG
+                var RC = new Reminder
                 {
-                    GuildID = G.Id,
-                    BotID = Bot.Id,
+                    GuildId = G.Id,
+                    BotId = Bot.Id,
                     Active = x,
+                    Duration = duration,
                 };
-                RC.ListenerList = new List<LISTENER>() { };
+                RC.Listeners = new List<Listener>() { };
                 await SC.AddAsync(RC);
                 await SC.SaveChangesAsync();
             }
@@ -90,8 +84,19 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {   
                 //Not using GetReminder(G, Bot) in order for the entity to be tracked by the context to be updated
-                var RC = SC.REMINDERCONFIGs.FirstOrDefault(r => r.GuildID == G.Id && r.BotID == Bot.Id);
+                var RC = SC.Reminders.FirstOrDefault(r => r.GuildId == G.Id && r.BotId == Bot.Id);
                 RC.Active = x;
+                await SC.SaveChangesAsync();
+            }
+        }
+
+        public async Task ModifyReminderDuration(SocketGuild G, SocketGuildUser Bot, int duration)
+        {
+            using (StatusBotContext SC = new StatusBotContext())
+            {
+                //Not using GetReminder(G, Bot) in order for the entity to be tracked by the context to be updated
+                var RC = SC.Reminders.FirstOrDefault(r => r.GuildId == G.Id && r.BotId == Bot.Id);
+                RC.Duration = duration;
                 await SC.SaveChangesAsync();
             }
         }
@@ -110,10 +115,10 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                var L = new LISTENER
+                var L = new Listener
                 {
                     UserID = Listener.Id,
-                    ReminderIDFK = GetReminderConfig(G, Bot).ReminderID,
+                    ReminderId = GetReminderConfig(G, Bot).ReminderId,
                 };
                 await SC.AddAsync(L); //Adds the Listener to the LISTENERs table
                 await SC.SaveChangesAsync();
@@ -134,7 +139,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.BotConfigs.FirstOrDefault(c => c.BotID == Bot.Id);
+                return SC.BotConfigs.FirstOrDefault(c => c.BotId == Bot.Id);
             }
         }
 
@@ -156,7 +161,7 @@ namespace StatusBot.Services
                     var row = new List<string>();
                     foreach (var colname in columnNames)
                     {
-                        string data = F.EscapeCSV(reader[colname].ToString());
+                        string data = (reader[colname].ToString().EscapeCSV());
                         row.Add(data);
                     }
                     records.Add(row);

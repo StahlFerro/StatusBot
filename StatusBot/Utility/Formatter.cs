@@ -5,21 +5,17 @@ using System.Linq;
 
 namespace StatusBot.Services
 {
-    public class Formatter
+    public static class Formatter
     {
-        private static List<char> csv_specials;
-        private static List<char> csv_operators;
-        private static List<char> csv_allchars;
-        public Formatter()
+        private static readonly List<char> csv_specials = new List<char> { ',', '"', '\r', '\n' };
+        private static readonly List<char> csv_operators = new List<char> { '=', '+', '-', '@' };
+
+        public static string EscapeCSV(this string rawstring)
         {
-            csv_specials = new List<char> { ',', '"', '\r', '\n' };
-            csv_operators = new List<char> { '=', '+', '-', '@' };
-            csv_allchars = new List<char>();
+            List<char> csv_allchars = new List<char>();
             csv_allchars.AddRange(csv_specials);
             csv_allchars.AddRange(csv_operators);
-        }
-        public string EscapeCSV(string rawstring)
-        {
+
             if (rawstring.Any(c => csv_allchars.Contains(c)))
             {
                 var cleanstring = new StringBuilder();
@@ -35,6 +31,8 @@ namespace StatusBot.Services
                 cleanstring.Append('"');
                 return cleanstring.ToString();
             }
+            else if (string.IsNullOrWhiteSpace(rawstring))
+                return " ";
             else
                 return rawstring;
         }

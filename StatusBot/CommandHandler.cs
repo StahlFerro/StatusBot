@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using StatusBot.Services;
+using StatusBot.TypeReaders;
 
 namespace StatusBot
 {
@@ -35,6 +36,7 @@ namespace StatusBot
 
         public async Task ConfigureAsync()
         {
+            C.AddTypeReader(typeof(ChronoString), new ChronoStringTypeReader());
             await C.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
@@ -47,7 +49,7 @@ namespace StatusBot
             if (!(parameterMessage is SocketUserMessage message) || message.Author.IsBot) return;
             int argPos = 0;
             if (!(message.HasMentionPrefix(client.CurrentUser, ref argPos) || message.HasStringPrefix("s]", ref argPos))) return;
-            var context = new CommandContext(client, message);
+            var context = new SocketCommandContext(client, message);
             var result = await C.ExecuteAsync(context, argPos, ISP);
 
             //Command success/fail notice message
@@ -61,7 +63,7 @@ namespace StatusBot
                 //Prevents unknown command exception to be posted as an error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ToString());
-                await _logservice.Write($"{result}", ConsoleColor.DarkRed);
+                await _logservice.Write($"{result}\n{result.ErrorReason}", ConsoleColor.DarkRed);
             }
         }
     }

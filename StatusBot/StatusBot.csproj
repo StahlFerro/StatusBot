@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
     <ApplicationIcon />
     <StartupObject />
@@ -12,13 +13,25 @@
     <PackageReference Include="Discord.Net.Commands" Version="2.0.0-beta" />
     <PackageReference Include="Discord.Net.Core" Version="2.0.0-beta" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.0-beta" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="1.1.11" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Logs\**\*" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Database\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <Compile Remove="Migrations\20181008174331_Create_DB_v4.cs" />
+    <Compile Remove="Migrations\20181008175011_Create_DB_v4.cs" />
+    <Compile Remove="Migrations\20181008175040_Create_DB_v4.cs" />
+    <Compile Remove="Migrations\20181008175103_Create_DB_v4.cs" />
+    <Compile Remove="Migrations\20181008175229_Create_DB_v4.cs" />
+    <Compile Remove="Old_v3_Migrations\20181008173406_Create_DB_v4.cs" />
+    <Compile Remove="Old_v3_Migrations\20181008173557_Create_DB_v4.cs" />
+    <Compile Remove="Old_v3_Migrations\20181008174551_Create_DB_v4.cs" />
+    <Compile Remove="v3_Old\v3_Migrations\20181008174616_Create_DB_v4.cs" />
     <Content Include="token.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>

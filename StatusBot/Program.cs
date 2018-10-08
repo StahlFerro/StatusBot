@@ -15,18 +15,18 @@ namespace StatusBot
         static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
         public static DiscordSocketClient client;
         private CommandHandler handler;
-        private DataAccess DA;
+        private DataService DS;
         private EventService ES;
         private LogService LS;
-        private Formatter F;
+        private TimerService TS;
+        private ReminderService RS;
         static Program()
         {
         }
 
         public async Task Start()
         {
-            F = new Formatter();
-            DA = new DataAccess(F);
+            DS = new DataService();
             LS = new LogService();
             await LS.Write("Starting StatusBot", ConsoleColor.DarkGreen);
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -35,7 +35,9 @@ namespace StatusBot
                 AlwaysDownloadUsers = true,
                 DefaultRetryMode = RetryMode.AlwaysRetry
             });
-            ES = new EventService(client, LS, DA);
+            TS = new TimerService(client);
+            RS = new ReminderService(client, TS, DS, LS);
+            ES = new EventService(client, LS, DS, RS);
             client.Log += ES.Log;
             var serviceprovider = ConfigureServices();
             string token = File.ReadAllText("token.txt");
@@ -50,7 +52,7 @@ namespace StatusBot
 
             client.MessageReceived += ES.MessageReceived;
             client.Connected += ES.AutoSetGame;
-            client.GuildMemberUpdated += ES.AutoPM;
+            client.GuildMemberUpdated += ES.OfflineListener;
 
             // Block this program until it is closed.
             await Task.Delay(-1);
@@ -62,8 +64,8 @@ namespace StatusBot
                 .AddSingleton(client)
                 .AddSingleton(new CommandService())
                 .AddSingleton(LS)
-                .AddSingleton(F)
-                .AddSingleton(DA);
+                .AddSingleton(DS)
+                .AddSingleton(TS);
             var provider = services.BuildServiceProvider();
             return provider;
         }
