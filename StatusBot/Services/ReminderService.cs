@@ -36,7 +36,18 @@ namespace StatusBot.Services
             TimeSpan duration = TimeSpan.FromSeconds(R.Duration);
             Timer ping_timer = new Timer(async _ => {
                 await PingListeners(after, listenerlist);
+                TS.DestroyTimer(R.ReminderId);
             }, null, duration, Timeout.InfiniteTimeSpan);
+
+            TS.Timers.TryAdd(R.ReminderId, ping_timer);
+            await Task.CompletedTask;
+        }
+
+        public async Task CancelReminder(SocketGuildUser bot)
+        {
+            var G = bot.Guild;
+            var R = DS.GetReminderConfig(G, bot);
+            await LS.Write($"Cancelled reminder: {TS.DestroyTimer(R.ReminderId)}");
             await Task.CompletedTask;
         }
 

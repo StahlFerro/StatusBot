@@ -85,6 +85,10 @@ namespace StatusBot.Services
                 {
                     await RS.RemindUsers(before, after);
                 }
+                else if (before.IsBot && before.Status == UserStatus.Offline && after.Status == UserStatus.Online)
+                {
+                    await RS.CancelReminder(before);
+                }
             });
             return Task.CompletedTask;
         }
