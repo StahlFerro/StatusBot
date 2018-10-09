@@ -1,4 +1,5 @@
-# StatusBot
+# StatusBot v3 (Old)
+# THIS VERSION IS DEPRECATED, PLEASE USE THE [MASTER](https://github.com/StahlFerro/StatusBot/tree/master) BRANCH
 
 StatusBot is a simple .NET Core discord bot that PM's a user if another bot goes offline. It comes with a very simple per-server configuration that determines what bot will be tracked for its status, and who will be PM'ed when the bot goes offline.
 
