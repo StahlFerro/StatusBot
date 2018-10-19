@@ -16,7 +16,7 @@ namespace StatusBot
         private CommandService C;
         private DiscordSocketClient client;
         private IServiceProvider ISP;
-        private LogService _logservice;
+        private LogService LS;
         Stopwatch T = new Stopwatch();
 
         void SWatchStart()
@@ -31,7 +31,7 @@ namespace StatusBot
             client = ISP.GetService<DiscordSocketClient>();
             client.MessageReceived += HandleCommand;
             C = ISP.GetService<CommandService>();
-            _logservice = ISP.GetService<LogService>();
+            LS = ISP.GetService<LogService>();
         }
 
         public async Task ConfigureAsync()
@@ -56,14 +56,14 @@ namespace StatusBot
             if (result.IsSuccess)
             {
                 SWatchStop();
-                await _logservice.Write($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkMagenta);
+                await LS.Write($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkMagenta);
             }
             else
             {
                 //Prevents unknown command exception to be posted as an error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ToString());
-                await _logservice.Write($"{result}\n{result.ErrorReason}", ConsoleColor.DarkRed);
+                await LS.WriteError($"{result}\n{result.ErrorReason}", ConsoleColor.DarkRed);
             }
         }
     }

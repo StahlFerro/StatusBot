@@ -47,7 +47,12 @@ namespace StatusBot.Services
         {
             var G = bot.Guild;
             var R = DS.GetReminderConfig(G, bot);
-            await LS.Write($"Cancelled reminder: {TS.DestroyTimer(R.ReminderId)}");
+            if (R != null)
+            {
+                TS.DestroyTimer(R.ReminderId);
+                await LS.Write($"Cancelled reminder for:\n" +
+                    $"ReminderId: {R.ReminderId} | BotId: {R.BotId}");
+            }
             await Task.CompletedTask;
         }
 

@@ -20,6 +20,7 @@ namespace StatusBot
         private LogService LS;
         private TimerService TS;
         private ReminderService RS;
+
         static Program()
         {
         }
@@ -52,7 +53,7 @@ namespace StatusBot
 
             client.MessageReceived += ES.MessageReceived;
             client.Connected += ES.AutoSetGame;
-            client.GuildMemberUpdated += ES.OfflineListener;
+            client.GuildMemberUpdated += ES.UserStatusHandler;
 
             // Block this program until it is closed.
             await Task.Delay(-1);

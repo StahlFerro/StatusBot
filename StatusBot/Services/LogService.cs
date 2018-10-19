@@ -12,21 +12,26 @@ namespace StatusBot.Services
 
     public class LogService
     {
-        private static readonly string logfilepath = "./Logs/logfile.txt";
+        private static readonly string normallogpath = "./Logs/logfile.txt";
+        private static readonly string errorlogpath = "./Logs/errorlog.txt";
 
         public async Task Write(string text, ConsoleColor color = ConsoleColor.Gray, TimeAppend timeformat = TimeAppend.Long)
         {
-            switch (timeformat)
-            {
-                case TimeAppend.Long:
-                    text = TimeStamp(text, TimeAppend.Long); break;
-                case TimeAppend.Short:
-                    text = TimeStamp(text, TimeAppend.Short); break;
-            }
+            await Log(text, color, timeformat, normallogpath);
+        }
+
+        public async Task WriteError(string text, ConsoleColor color = ConsoleColor.Red, TimeAppend timeformat = TimeAppend.Long)
+        {
+            await Log(text, color, timeformat, errorlogpath);
+        }
+
+        private async Task Log(string text, ConsoleColor color, TimeAppend timeformat, string logpath)
+        {
+            text = TimeStamp(text, timeformat);
             Console.ForegroundColor = color;
             Console.WriteLine(text);
             Console.ResetColor();
-            await File.AppendAllTextAsync(logfilepath, $"{text}\n");
+            await File.AppendAllTextAsync(logpath, $"{text}\n");
         }
 
         public string TimeStamp(string text, TimeAppend timeformat = TimeAppend.Long)

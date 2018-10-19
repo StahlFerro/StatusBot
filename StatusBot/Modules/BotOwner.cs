@@ -20,7 +20,7 @@ namespace StatusBot.Modules
     {
         private DataService DA;
         private TimerService TS;
-        Random R;
+        readonly Random R;
 
         public BotOwner(IServiceProvider ISP)
         {
@@ -93,7 +93,7 @@ namespace StatusBot.Modules
             }
             else if (option == "csv")
             {
-                string csvstring = String.Join("\n", records.Select(record => String.Join(",", record)));
+                string csvstring = string.Join("\n", records.Select(record => string.Join(",", record)));
                 var timestamp = DateTime.Now.ToLocalTime().ToFileTime();
                 string filename = $"query_{timestamp}.csv";
 
