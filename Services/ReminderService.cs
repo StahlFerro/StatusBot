@@ -63,7 +63,12 @@ namespace StatusBot.Services
 
             foreach (var listener in listeners)
             {
-                var U = Program.client.GetUser(listener.UserID);
+                var U = _client.GetUser(listener.UserID);
+                if (U == null)
+                {
+                    await LS.Write($"Listener with UserID: {listener.UserID} in server {after.Guild} ({after.Guild.Id})");
+                    return;
+                }
                 var dmch = await U.GetOrCreateDMChannelAsync();
                 ping_tasks.Add(dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC"));
                 log_tasks.Add(LS.Write($"Successfully PM'd {U} that {after} is offline", ConsoleColor.Cyan));

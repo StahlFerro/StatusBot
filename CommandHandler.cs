@@ -37,7 +37,7 @@ namespace StatusBot
         public async Task ConfigureAsync()
         {
             C.AddTypeReader(typeof(ChronoString), new ChronoStringTypeReader());
-            await C.AddModulesAsync(Assembly.GetEntryAssembly());
+            await C.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: ISP);
         }
 
         public async Task HandleCommand(SocketMessage parameterMessage)
