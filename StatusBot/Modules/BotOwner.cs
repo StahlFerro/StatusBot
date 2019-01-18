@@ -21,12 +21,13 @@ namespace StatusBot.Modules
         private DataService DA;
         private TimerService TS;
         readonly Random R;
-
+        private CommandService C;
         public BotOwner(IServiceProvider ISP)
         {
             DA = ISP.GetService<DataService>();
             TS = ISP.GetService<TimerService>();
             R = new Random();
+            C = ISP.GetService<CommandService>();
         }
 
         [Command("reboot")]
@@ -121,6 +122,46 @@ namespace StatusBot.Modules
         {
             if (!TS.Timers.Any()) { await ReplyAsync("No timers"); return; }
             await ReplyAsync(string.Join("\n", TS.Timers.Select(t => $"{t.Key} {t.Value}")));
+        }
+
+        [Command("inspect_module", RunMode = RunMode.Async)]
+        [RequireOwner]
+        public async Task Inspect(string format, [Remainder] string module){
+            var commands = C.Modules.FirstOrDefault(m => m.Name == module).Commands.OrderBy(x => x.Name);
+            if (format == "txt"){
+                await ReplyAsync(string.Join("\n", commands.Select(c => $"**{c.Name}**\n{c.Summary}").ToList()));
+            }
+            else if (format == "rst"){
+                StringBuilder rst = new StringBuilder();
+                foreach (var cmd in commands){
+                    rst.Append($"{cmd.Name}\n---------------\n");
+                    string summary = cmd.Summary;
+                    if (!summary.Contains("Usage:")){
+                        rst.Append(".. parsed-literal::\n");
+                        rst.Append($"    |bot_prefix|\\ {cmd.Name}\n");
+                    }
+                    var summarray = summary.Split('\n');
+                    foreach (string sumline in summarray){
+                        if (sumline == summarray[0]){
+                            rst.Append($"{sumline}\n");
+                        }
+                        else if (sumline.StartsWith("Example:")){
+                            string singlehelpstr = sumline.Substring(8).TrimStart();
+                            rst.Append($"Example:\n{singlehelpstr}\n");
+                        }
+                        else if (sumline.Trim() == "Examples:"){
+                            rst.Append($"Examples:\n");
+                        }
+                        else if (sumline.StartsWith("`")){
+                            rst.Append($"{sumline}\n");
+                        }
+                    }
+                    rst.Append("....\n\n");
+                    string desc = summary.IndexOf("Summary: ").ToString();
+                }
+                await ReplyAsync(rst.ToString());
+                MemoryStream MS = new MemoryStream();
+            }
         }
     }
 }
