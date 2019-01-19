@@ -28,7 +28,11 @@ namespace StatusBot.Modules
         }
 
         [Command("rmd")]
-        [Summary("Displays all the bot reminders in the current server")]
+        [Summary("Lists all the bot reminders in the current server, or lists all the listeners of a specified bot reminder\n" +
+            "Usage: `s]rmd [bot]`\n" + 
+            "Examples:\n" + 
+            "`s]rmd` Lists all the bot reminders in the current server\n" + 
+            "`s]rmd okBot` Lists all the listeners of okBot")]
         [RequireContext(ContextType.Guild)]
         public async Task Reminders([Remainder] SocketGuildUser Bot = null)
         {
@@ -69,7 +73,9 @@ namespace StatusBot.Modules
 
 
         [Command("addrmd")]
-        [Summary("Adds a new bot reminder to the list\nExamples:\n" +
+        [Summary("Adds a new bot reminder to the list\n" +
+            "usage: `s]addrmd (bot) [duration]`\n" +
+            "Examples:\n" +
             "`s]addrmd MyBot` Adds a bot to be tracked for it's offline status. Duration is 0 seconds by default, once the bot is offline, StatusBot " + 
             "immediately pings all the listener of the reminders\n" +
             "`s]addrmd MyBot 2s` Adds as well as setting the duration to 2 seconds")]
@@ -94,9 +100,11 @@ namespace StatusBot.Modules
         }
 
         [Command("switchrmd")]
-        [Summary("Activates or deactivates a bot reminder.\nExamples:\n" +
-            "`s]switchrmd MyBot on` Activates the reminder\n" +
-            "`s]switchrmd MyBot off` Deactivates the reminder")]
+        [Summary("Activates or deactivates a bot reminder.\n" +
+            "Usage: `s]switchrmd (bot) < off | on >`\n" +
+            "Examples:\n" +
+            "`s]switchrmd MyBot on` Activates the reminder for MyBot\n" +
+            "`s]switchrmd MyBot off` Deactivates the reminder for MyBot")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(GuildPermission.ManageMessages)]
@@ -127,9 +135,11 @@ namespace StatusBot.Modules
         }
 
         [Command("durationrmd")]
-        [Summary("Modifies the duration of a bot reminder\nExamples:\n" +
-            "`]!durationrmd MyBot` Sets the reminder delay duration to 0 seconds (default)\n" +
-            "`]!durationrmd MyBot 12s` Sets the reminder delay duration to 12 seconds")]
+        [Summary("Modifies the duration of a bot reminder.\n" + 
+            "Usage: `s]durationrmd (bot) [duration]`\n" +
+            "Examples:\n" +
+            "`s]durationrmd MyBot` Sets the reminder delay duration to 0 seconds (default)\n" +
+            "`s]durationrmd MyBot 12s` Sets the reminder delay duration to 12 seconds")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(GuildPermission.ManageMessages)]
         public async Task DurationRmd(SocketGuildUser bot, [Remainder] ChronoString CS = null)
@@ -144,7 +154,8 @@ namespace StatusBot.Modules
         }
 
         [Command("delrmd")]
-        [Summary("Removes a bot reminder from the list\n" + 
+        [Summary("Removes a bot reminder from the list.\n" +
+            "Usage: `s]delrmd (bot)`\n" + 
             "Example: `s]delrmd MyBot` MyBot's offline status will not be tracked by StatusBot")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
@@ -164,7 +175,9 @@ namespace StatusBot.Modules
         }
 
         [Command("addlsnr")]
-        [Summary("Adds a new listener to a bot reminder\nExamples:\n" +
+        [Summary("Adds a new listener to a bot reminder\n" +
+            "Usage: `s]addlsnr (bot) [user]`\n" +
+            "Examples:\n" +
             "`s]addlist MyBot` Assigns yourself to the MyBot reminder\n" +
             "`s]addlist MyBot Han` Assigns another user named Han to the MyBot reminder")]
         [RequireContext(ContextType.Guild)]
@@ -188,7 +201,9 @@ namespace StatusBot.Modules
         }
 
         [Command("dellsnr")]
-        [Summary("Removes a listener from a bot reminder\nExamples:\n" +
+        [Summary("Removes a listener from a bot reminder\n" +
+            "Usage: `s]dellsnr (bot) [user]`\n" +
+            "Examples:\n" +
             "`s]dellist MyBot` Removes yourself from the MyBot reminder\n" +
             "`s]dellist MyBot Solo` Removes another user named Solo from the MyBot reminder")]
         [RequireContext(ContextType.Guild)]

@@ -18,6 +18,11 @@ namespace StatusBot.Modules
         }
 
         [Command("help")]
+        [Summary("Lists all of StatusBot's commands, or see the help information on a single command\n" + 
+            "Usage: `s]help [command_name]`\n" +
+            "Examples:\n" + 
+            "`s]help` Lists all of StatusBot's commands\n" +
+            "`s]help rmd` See the information of the `rmd` command\n")]
         [Alias("h")]
         [RequireContext(ContextType.Guild)]
         public async Task HelpModule([Remainder] string command = null)
@@ -73,6 +78,5 @@ namespace StatusBot.Modules
                 await ReplyAsync("", false, E.Build());
             }
         }
-
     }
 }

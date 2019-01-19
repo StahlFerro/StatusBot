@@ -124,43 +124,60 @@ namespace StatusBot.Modules
             await ReplyAsync(string.Join("\n", TS.Timers.Select(t => $"{t.Key} {t.Value}")));
         }
 
-        [Command("inspect_module", RunMode = RunMode.Async)]
+        [Command("update_docs", RunMode = RunMode.Async)]
         [RequireOwner]
         public async Task Inspect(string format, [Remainder] string module){
-            var commands = C.Modules.FirstOrDefault(m => m.Name == module).Commands.OrderBy(x => x.Name);
+            var commands = C.Modules.FirstOrDefault(m => m.Name == module).Commands.OrderBy(x => x.Name).ToArray();
             if (format == "txt"){
                 await ReplyAsync(string.Join("\n", commands.Select(c => $"**{c.Name}**\n{c.Summary}").ToList()));
             }
             else if (format == "rst"){
                 StringBuilder rst = new StringBuilder();
+                rst.Append($"*****************\n{module}\n*****************\n\n");
                 foreach (var cmd in commands){
                     rst.Append($"{cmd.Name}\n---------------\n");
                     string summary = cmd.Summary;
-                    if (!summary.Contains("Usage:")){
-                        rst.Append(".. parsed-literal::\n");
-                        rst.Append($"    |bot_prefix|\\ {cmd.Name}\n");
-                    }
+                    // if (summary.Contains("Usage:")){
+                    //     rst.Append(".. parsed-literal::\n");
+                    //     rst.Append($"    |bot_prefix|\\ {cmd.Name}\n");
+                    // }
                     var summarray = summary.Split('\n');
                     foreach (string sumline in summarray){
-                        if (sumline == summarray[0]){
-                            rst.Append($"{sumline}\n");
+                        if (sumline.StartsWith("Usage:")){  // Syntax in the second line of the command's summary. If exists, placed first after command name
+                            string syntax = sumline.Substring(6).Trim().Replace("`", "");
+                            rst.Append(".. code::\n\n");
+                            rst.Append($"\t{syntax}\n\n");
                         }
                         else if (sumline.StartsWith("Example:")){
-                            string singlehelpstr = sumline.Substring(8).TrimStart();
-                            rst.Append($"Example:\n{singlehelpstr}\n");
+                            string examplestr = sumline.Substring(8).Trim();  // Cut off the 'Example:' part of the string
+                            int lasttick = examplestr.LastIndexOf("`");
+                            string code = examplestr.Substring(1, lasttick - 1);
+                            string details = examplestr.Substring(lasttick + 1).Trim();
+                            rst.Append($"Example:\n\n``{code}`` {details}\n");
                         }
                         else if (sumline.Trim() == "Examples:"){
-                            rst.Append($"Examples:\n");
+                            rst.Append($"Examples:\n\n");
                         }
-                        else if (sumline.StartsWith("`")){
-                            rst.Append($"{sumline}\n");
+                        else if (sumline.StartsWith("`")){  // Example commands
+                            int lasttick = sumline.LastIndexOf("`");
+                            string code = sumline.Substring(1, lasttick - 1);
+                            string details = sumline.Substring(lasttick + 1).Trim();
+                            rst.Append($"- ``{code}``\n  {details}\n");
                         }
+                        else
+                            rst.Append($"{sumline}\n\n");
                     }
-                    rst.Append("....\n\n");
-                    string desc = summary.IndexOf("Summary: ").ToString();
+                    if (cmd != commands.Last())
+                        rst.Append("\n....\n\n");
                 }
-                await ReplyAsync(rst.ToString());
-                MemoryStream MS = new MemoryStream();
+                string rstring = rst.ToString();
+                await ReplyAsync(rstring);
+                //MemoryStream MS = new MemoryStream();
+                using (StreamWriter writer = new StreamWriter($@"C:\Users\asus\Documents\Visual Studio 2017\Projects\StatusBot\docs\source\{module}.rst"))
+                {
+                    await writer.WriteLineAsync(rstring);
+                    await writer.FlushAsync();
+                }
             }
         }
     }
