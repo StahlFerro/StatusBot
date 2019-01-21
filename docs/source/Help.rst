@@ -14,8 +14,10 @@ Examples:
 
 - ``s]help``
   Lists all of StatusBot's commands
+
 - ``s]help rmd` See the information of the `rmd``
   command
+
 
 
 

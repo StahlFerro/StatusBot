@@ -21,13 +21,13 @@ namespace StatusBot.Modules
         private DataService DA;
         private TimerService TS;
         readonly Random R;
-        private CommandService C;
+        private CommandService CS;
         public BotOwner(IServiceProvider ISP)
         {
             DA = ISP.GetService<DataService>();
             TS = ISP.GetService<TimerService>();
             R = new Random();
-            C = ISP.GetService<CommandService>();
+            CS = ISP.GetService<CommandService>();
         }
 
         [Command("reboot")]
@@ -126,17 +126,20 @@ namespace StatusBot.Modules
 
         [Command("update_docs", RunMode = RunMode.Async)]
         [RequireOwner]
-        public async Task Inspect(string format, [Remainder] string module){
-            var commands = C.Modules.FirstOrDefault(m => m.Name == module).Commands.OrderBy(x => x.Name).ToArray();
+        public async Task Inspect(string format, string path, [Remainder] string module){
+            var commands = CS.Modules.FirstOrDefault(m => m.Name == module).Commands.Where(c => !string.IsNullOrWhiteSpace(c.Summary))
+                            .OrderBy(x => x.Name).ToArray();
             if (format == "txt"){
                 await ReplyAsync(string.Join("\n", commands.Select(c => $"**{c.Name}**\n{c.Summary}").ToList()));
             }
             else if (format == "rst"){
                 StringBuilder rst = new StringBuilder();
                 rst.Append($"*****************\n{module}\n*****************\n\n");
+                await ReplyAsync($"Obtained {commands.Count()}");
                 foreach (var cmd in commands){
+                    Console.WriteLine($"Command: {cmd.Name}");
                     rst.Append($"{cmd.Name}\n---------------\n");
-                    string summary = cmd.Summary;
+                    string summary = cmd.Summary ?? "None";
                     // if (summary.Contains("Usage:")){
                     //     rst.Append(".. parsed-literal::\n");
                     //     rst.Append($"    |bot_prefix|\\ {cmd.Name}\n");
@@ -162,18 +165,27 @@ namespace StatusBot.Modules
                             int lasttick = sumline.LastIndexOf("`");
                             string code = sumline.Substring(1, lasttick - 1);
                             string details = sumline.Substring(lasttick + 1).Trim();
-                            rst.Append($"- ``{code}``\n  {details}\n");
+                            rst.Append($"- ``{code}``\n  {details}\n\n");
                         }
-                        else
-                            rst.Append($"{sumline}\n\n");
+                        else{
+                            rst.Append($"{sumline.Replace("`", "``")}\n\n");
+                        }
                     }
                     if (cmd != commands.Last())
                         rst.Append("\n....\n\n");
                 }
                 string rstring = rst.ToString();
-                await ReplyAsync(rstring);
+                if (rstring.Count() > 2000){
+                    foreach (int page in Enumerable.Range(1, (int)Math.Ceiling((double)rstring.Count() / 2000))){
+                        int skip = ((page - 1) * 2000);
+                        Console.WriteLine(skip);
+                        await ReplyAsync(new String(rstring.Skip(skip).Take(2000).ToArray()));
+                    }
+                }
+                else
+                    await ReplyAsync(rstring);
                 //MemoryStream MS = new MemoryStream();
-                using (StreamWriter writer = new StreamWriter($@"C:\Users\asus\Documents\Visual Studio 2017\Projects\StatusBot\docs\source\{module}.rst"))
+                using (StreamWriter writer = new StreamWriter($@"{path}.rst"))
                 {
                     await writer.WriteLineAsync(rstring);
                     await writer.FlushAsync();

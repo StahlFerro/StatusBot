@@ -13,3 +13,4 @@ Welcome to StatusBot's documentation!
     Help
     Utility
     ReminderCommand
+    BotOwner
