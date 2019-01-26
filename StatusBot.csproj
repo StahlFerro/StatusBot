@@ -23,6 +23,7 @@
   <ItemGroup>
     <Content Include="Logs\**\*" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Database\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="RunStatusBot.sh" CopyToPublishDirectory="PreserveNewest" />
     <Compile Remove="Migrations\20181008174331_Create_DB_v4.cs" />
     <Compile Remove="Migrations\20181008175011_Create_DB_v4.cs" />
     <Compile Remove="Migrations\20181008175040_Create_DB_v4.cs" />
