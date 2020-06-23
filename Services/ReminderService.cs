@@ -50,7 +50,7 @@ namespace StatusBot.Services
             if (R != null)
             {
                 TS.DestroyTimer(R.ReminderId);
-                await LS.Write($"Cancelled reminder for:\n" +
+                await LS.WriteAsync($"Cancelled reminder for:\n" +
                     $"ReminderId: {R.ReminderId} | BotId: {R.BotId}");
             }
             await Task.CompletedTask;
@@ -66,12 +66,12 @@ namespace StatusBot.Services
                 var U = _client.GetUser(listener.UserID);
                 if (U == null)
                 {
-                    await LS.Write($"Listener with UserID: {listener.UserID} in server {after.Guild} ({after.Guild.Id})");
+                    await LS.WriteAsync($"Listener with UserID: {listener.UserID} in server {after.Guild} ({after.Guild.Id})");
                     return;
                 }
                 var dmch = await U.GetOrCreateDMChannelAsync();
                 ping_tasks.Add(dmch.SendMessageAsync($"{after} is offline at {DateTime.UtcNow} UTC"));
-                log_tasks.Add(LS.Write($"Successfully PM'd {U} that {after} is offline", ConsoleColor.Cyan));
+                log_tasks.Add(LS.WriteAsync($"Successfully PM'd {U} that {after} is offline", ConsoleColor.Cyan));
             }
 
             await Task.WhenAll(ping_tasks);

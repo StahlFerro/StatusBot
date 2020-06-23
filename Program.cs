@@ -29,7 +29,7 @@ namespace StatusBot
         {
             DS = new DataService();
             LS = new LogService();
-            await LS.Write("Starting StatusBot", ConsoleColor.DarkGreen);
+            _ = LS.WriteAsync("Starting StatusBot...", ConsoleColor.DarkGreen);
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
@@ -46,7 +46,7 @@ namespace StatusBot
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
             time.Stop();
-            await LS.Write($"Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkGreen);
+            _ = LS.WriteAsync($"Connected in {time.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkGreen);
 
             handler = new CommandHandler(serviceprovider);
             await handler.ConfigureAsync();

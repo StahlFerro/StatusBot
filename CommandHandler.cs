@@ -56,14 +56,14 @@ namespace StatusBot
             if (result.IsSuccess)
             {
                 SWatchStop();
-                await LS.Write($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkMagenta);
+                await LS.WriteAsync($"Command finished in {T.Elapsed.TotalSeconds.ToString("F3")} seconds", ConsoleColor.DarkMagenta);
             }
             else
             {
                 //Prevents unknown command exception to be posted as an error message in discord
                 if (result.Error.Value != CommandError.UnknownCommand)
                     await message.Channel.SendMessageAsync(result.ToString());
-                await LS.WriteError($"{result}\n{result.ErrorReason}", ConsoleColor.DarkRed);
+                await LS.WriteErrorAsync($"{result}\n{result.ErrorReason}", ConsoleColor.DarkRed);
             }
         }
     }

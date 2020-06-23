@@ -3,44 +3,52 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
+using System.Runtime.Versioning;
 
 namespace StatusBot.Services
 {
-    public enum TimeAppend { Short, Long }
+    public enum TimeAppend { Long, Short }
 
     public class LogService
     {
-        private static readonly string normallogpath = "./Logs/logfile.txt";
-        private static readonly string errorlogpath = "./Logs/errorlog.txt";
-
-        public async Task Write(string text, ConsoleColor color = ConsoleColor.Gray, TimeAppend timeformat = TimeAppend.Long)
+        public LogService()
         {
-            await Log(text, color, timeformat, normallogpath);
+            Console.WriteLine("LogService initialized");
         }
-
-        public async Task WriteError(string text, ConsoleColor color = ConsoleColor.Red, TimeAppend timeformat = TimeAppend.Long)
+        private readonly string logdir = Path.GetFullPath("./Logs/");
+        private readonly string d_format = "yyyy-MM-dd";
+        private readonly string t_format = "HH:mm:ss";
+        public async Task WriteAsync(string text, ConsoleColor color = ConsoleColor.Gray, TimeAppend append = TimeAppend.Long)
         {
-            await Log(text, color, timeformat, errorlogpath);
-        }
-
-        private async Task Log(string text, ConsoleColor color, TimeAppend timeformat, string logpath)
-        {
-            text = TimeStamp(text, timeformat);
+            text = TimeStamp(text, append);
             Console.ForegroundColor = color;
             Console.WriteLine(text);
             Console.ResetColor();
+            string date_now = DateTime.Now.ToLocalTime().ToString(d_format);
+            string fname = $"log_{date_now}.txt";
+            string logpath = Path.Join(new string[] { logdir, fname });
             await File.AppendAllTextAsync(logpath, $"{text}\n");
         }
 
-        public string TimeStamp(string text, TimeAppend timeformat = TimeAppend.Long)
+        public async Task WriteErrorAsync(string text, ConsoleColor color = ConsoleColor.Red, TimeAppend append = TimeAppend.Long)
         {
-            DateTime now = DateTime.Now;
-            if (timeformat == TimeAppend.Long)
-                return $"{now.ToShortDateString()} {now.ToLongTimeString()} {text}";
+            text = TimeStamp(text, append);
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ResetColor();
+            string date_now = DateTime.Now.ToLocalTime().ToString(d_format);
+            string fname = $"log_{date_now}.txt";
+            string logpath = Path.Join(new string[] { logdir, fname });
+            await File.AppendAllTextAsync(logpath, $"{text}\n");
+        }
+
+        private string TimeStamp(string text, TimeAppend append)
+        {
+            DateTime now = DateTime.Now.ToLocalTime();
+            if (append == TimeAppend.Long)
+                return $"{now.ToString(d_format)} {now.ToString(t_format)} {text}";
             else
-                return $"{now.ToShortDateString()} {text}";
+                return $"{now.ToString(d_format)} {text}";
         }
     }
 }

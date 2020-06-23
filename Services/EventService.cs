@@ -51,14 +51,14 @@ namespace StatusBot.Services
                     var G = CE.Context.Guild;
                     var tch = CE.Context.Channel;
                     var U = CE.Context.User;
-                    await LS.WriteError($"⚠ {CE.Command.Aliases.First()} exception ⚠\n" +
+                    await LS.WriteAsync($"⚠ {CE.Command.Aliases.First()} exception ⚠\n" +
                         $"Guild: {G.Name} ({G.Id})\n" +
                         $"Channel: {tch.Name} ({tch.Id})\n" +
                         $"User: {U} ({U.Id})\n" +
                         $"Exception:\n" +
                         $"{CE.Message}\n{CE.StackTrace}\n{CE.InnerException.Message}\n{CE.InnerException.StackTrace}");
                 }
-                await LS.Write(msg.ToString(), cc, TimeAppend.Short);
+                await LS.WriteAsync(msg.ToString(), cc, TimeAppend.Short);
             });
             return Task.CompletedTask;
         }
@@ -72,7 +72,7 @@ namespace StatusBot.Services
                 {
                     var ch = msg.Channel as IGuildChannel;
                     var G = ch.Guild as IGuild;
-                    await LS.Write($"[{msg.Author}] {msg}", ConsoleColor.Green);
+                    await LS.WriteAsync($"[{msg.Author}] {msg}", ConsoleColor.Green);
                 }
             });
             return Task.CompletedTask;
