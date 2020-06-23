@@ -31,7 +31,7 @@ namespace StatusBot.Services
         {
             using (StatusBotContext SC = new StatusBotContext())
             {
-                return SC.Reminders.Where(rc => rc.GuildId == G.Id).ToList();
+                return SC.Reminders.AsQueryable().Where(rc => rc.GuildId == G.Id).ToList();
             }
         }
 
@@ -49,7 +49,7 @@ namespace StatusBot.Services
             {
                 var RC = GetReminderConfig(G, Bot);
                 var ReminderId = RC.ReminderId;
-                return SC.Listeners.Where(l => l.ReminderId == ReminderId).ToList();
+                return SC.Listeners.AsQueryable().Where(l => l.ReminderId == ReminderId).ToList();
             }
         }
 
@@ -58,7 +58,7 @@ namespace StatusBot.Services
             using (StatusBotContext SC = new StatusBotContext())
             {
                 var ReminderId = RC.ReminderId;
-                return SC.Listeners.Where(l => l.ReminderId == ReminderId).ToList();
+                return SC.Listeners.AsQueryable().Where(l => l.ReminderId == ReminderId).ToList();
             }
         }
 
